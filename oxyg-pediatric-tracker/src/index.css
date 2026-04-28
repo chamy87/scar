@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-scarlet-primary: #b91c1c;
+  --color-scarlet-deep: #7f1d1d;
+  --color-scarlet-soft: #fee2e2;
+  --color-accent-rose: #e11d48;
+  --color-bg-clinical: #fff7f7;
+  --color-text-main: #111827;
+  --color-text-muted: #6b7280;
+  --color-border-soft: #f3d4d4;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-clinical);
+  color: var(--color-text-main);
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
