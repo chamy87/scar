@@ -39,8 +39,8 @@ export function TrendChartCard({ readings, canAdd }: { readings: Reading[]; canA
           ))}
         </div>
       </div>
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-80 min-w-0">
+        <ResponsiveContainer width="99%" height="100%" minWidth={320} minHeight={260}>
           <LineChart data={chartData}>
             <XAxis dataKey="t" />
             <YAxis />

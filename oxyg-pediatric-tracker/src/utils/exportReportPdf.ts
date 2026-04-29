@@ -6,7 +6,7 @@ export async function exportReportPdf(elementId = "report-pdf-content") {
   document.body.classList.add("exporting-pdf")
   await new Promise((resolve) => setTimeout(resolve, 120))
   try {
-    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")])
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")])
     const scale = Math.min(1.5, window.devicePixelRatio || 1.5)
     const canvas = await html2canvas(element, {
       scale,

@@ -16,7 +16,7 @@ export function ReportCharts({ rows, threshold }: { rows: NormalizedReportReadin
       <div className={chartCard}>
         <h3 className="mb-2 font-semibold">SpO₂ Trend</h3>
         <div className="report-chart-height">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="99%" height="100%" minWidth={320} minHeight={260}>
             <ComposedChart data={data}>
               <XAxis dataKey="t" hide />
               <YAxis domain={[minSpo2, maxSpo2]} />
@@ -30,7 +30,7 @@ export function ReportCharts({ rows, threshold }: { rows: NormalizedReportReadin
       <div className={chartCard}>
         <h3 className="mb-2 font-semibold">BPM Trend</h3>
         <div className="report-chart-height-bpm">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="99%" height="100%" minWidth={320} minHeight={220}>
             <ComposedChart data={data.filter((d) => d.bpm != null)}>
               <XAxis dataKey="t" hide />
               <YAxis />
@@ -45,7 +45,7 @@ export function ReportCharts({ rows, threshold }: { rows: NormalizedReportReadin
       <div className={chartCard}>
         <h3 className="mb-2 font-semibold">PI Trend</h3>
         <div className="report-chart-height-bpm">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="99%" height="100%" minWidth={320} minHeight={220}>
             <ComposedChart data={data.filter((d) => d.pi != null)}>
               <XAxis dataKey="t" hide />
               <YAxis />
@@ -58,7 +58,7 @@ export function ReportCharts({ rows, threshold }: { rows: NormalizedReportReadin
       <div className={chartCard}>
         <h3 className="mb-2 font-semibold">SpO₂ Range Visualization</h3>
         <div className="report-chart-height-range">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="99%" height="100%" minWidth={320} minHeight={240}>
             <ComposedChart data={data}>
               <XAxis dataKey="t" hide />
               <YAxis />
