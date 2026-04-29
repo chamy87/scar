@@ -2,9 +2,18 @@ export type Reading = {
   id: string
   patient_id: string
   device_id: string | null
-  spo2: number
-  bpm: number
+  spo2: number | null
+  spo2_min: number | null
+  spo2_max: number | null
+  spo2_avg: number | null
+  is_spo2_range: boolean
+  measured_start: string | null
+  measured_end: string | null
+  bpm: number | null
   pi: number | null
+  signal_quality: string | null
+  notes: string | null
+  waveform: string | null
   recorded_at: string
   created_by: string | null
 }

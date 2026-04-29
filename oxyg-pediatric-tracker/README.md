@@ -1,4 +1,4 @@
-# OxyG Pediatric Tracker
+# Scarlett's Pediatric Tracker
 
 React + Vite + TypeScript pediatric Tetralogy of Fallot oxygen/heart-rate reporting tool.
 

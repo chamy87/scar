@@ -1,5 +1,5 @@
 import { Activity } from "lucide-react"
-import { AuthButton } from "@/components/auth/AuthButton"
+import { AuthButton } from "@/components/AuthButton"
 import { Button } from "@/components/ui/button"
 import { PatientAvatar } from "@/components/patient/PatientAvatar"
 import { NavLink } from "react-router-dom"

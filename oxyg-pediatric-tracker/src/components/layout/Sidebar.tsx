@@ -15,7 +15,7 @@ export function Sidebar() {
       <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border-soft bg-scarlet-soft/40 p-3">
         <div className="rounded-xl bg-scarlet-primary p-2 text-white"><ChartNoAxesCombined className="size-5" /></div>
         <div>
-          <p className="text-sm font-semibold text-scarlet-deep">OxyG Pediatric Tracker</p>
+          <p className="text-sm font-semibold text-scarlet-deep">Scarlett&apos;s Pediatric Tracker</p>
           <p className="text-xs text-text-muted">Cardiology Reporting</p>
         </div>
       </div>
