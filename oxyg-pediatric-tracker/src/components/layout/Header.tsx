@@ -30,7 +30,6 @@ export function Header({
           <PatientAvatar name={patientName} photoUrl={photoUrl} size="sm" />
           <div>
             <p className="text-sm font-semibold text-text-main">{patientName}</p>
-            <p className="text-xs text-text-muted">Diagnosis: Tetralogy of Fallot</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

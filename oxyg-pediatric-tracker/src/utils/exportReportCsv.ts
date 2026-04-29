@@ -19,7 +19,6 @@ export function exportReportCsv({
 }) {
   const headers = [
     "patient_name",
-    "diagnosis",
     "report_start",
     "report_end",
     "measured_at",
@@ -42,7 +41,6 @@ export function exportReportCsv({
     const readingType = row.readingKind === "single" ? "Spot check" : row.readingKind === "range" ? "Range reading" : "Continuous sample"
     const values = [
       patientName,
-      "",
       reportStart,
       reportEnd,
       row.recordedAtISO,

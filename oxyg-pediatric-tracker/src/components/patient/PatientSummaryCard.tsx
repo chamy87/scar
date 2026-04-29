@@ -46,7 +46,6 @@ export function PatientSummaryCard({
           <PatientAvatar name={name} photoUrl={patient?.photo_url} size="lg" />
           <div>
             <h2 className="text-xl font-semibold">{name}</h2>
-            <p className="text-sm text-text-muted">Tetralogy of Fallot</p>
             <p className="mt-1 text-xs text-text-muted">
               <CalendarDays className="mr-1 inline size-3" />
               Age: {ageFromDob(patient?.dob)}

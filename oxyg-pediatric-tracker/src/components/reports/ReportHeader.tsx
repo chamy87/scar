@@ -31,7 +31,6 @@ export function ReportHeader({ patient, startISO, endISO }: { patient: Patient |
           <div className="text-sm">
             <h1 className="text-lg font-semibold text-scarlet-deep">Scarlett&apos;s Pediatric Tracker — Cardiology Report</h1>
             <p className="font-semibold">{name}</p>
-            <p className="text-text-muted">Diagnosis: Tetralogy of Fallot</p>
             <p className="text-text-muted">Age: {ageFromDob(patient?.dob)}</p>
           </div>
         </div>
