@@ -9,6 +9,7 @@ export type ReadingInput = {
   spo2_max: number | null
   spo2_avg: number
   is_spo2_range: boolean
+  reading_type: string
   measured_start: string
   measured_end: string
   bpm?: number | null
