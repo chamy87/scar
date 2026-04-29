@@ -103,7 +103,6 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
         }
       }} onDownloadCsv={() => exportReportCsv({
         patientName: selectedPatient?.display_name ?? "Pediatric Patient",
-        diagnosis: "Tetralogy of Fallot",
         reportStart: new Date(start).toISOString(),
         reportEnd: new Date(end).toISOString(),
         rows,

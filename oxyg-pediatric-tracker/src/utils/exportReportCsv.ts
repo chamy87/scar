@@ -8,13 +8,11 @@ function csvEscape(value: string) {
 
 export function exportReportCsv({
   patientName,
-  diagnosis,
   reportStart,
   reportEnd,
   rows,
 }: {
   patientName: string
-  diagnosis: string
   reportStart: string
   reportEnd: string
   rows: NormalizedReportReading[]
@@ -40,18 +38,17 @@ export function exportReportCsv({
   ]
   const lines = [headers.join(",")]
   for (const row of rows) {
-    const [start, end] = row.timeWindow.split(" - ")
     const spo2Display = row.readingKind === "range" ? `${row.spo2Min}-${row.spo2Max}% avg ${row.spo2Avg}%` : `${row.spo2Avg}%`
     const readingType = row.readingKind === "single" ? "Spot check" : row.readingKind === "range" ? "Range reading" : "Continuous sample"
     const values = [
       patientName,
-      diagnosis,
+      "",
       reportStart,
       reportEnd,
-      row.displayTime,
+      row.recordedAtISO,
       readingType,
-      start ?? "",
-      end ?? "",
+      row.timeWindowStartISO,
+      row.timeWindowEndISO,
       `${row.spo2Min}`,
       `${row.spo2Max}`,
       `${row.spo2Avg}`,

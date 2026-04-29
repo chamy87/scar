@@ -6,6 +6,8 @@ export type NormalizedReportReading = {
   readingKind: "single" | "range" | "continuous_sample"
   displayTime: string
   timeWindow: string
+  timeWindowStartISO: string
+  timeWindowEndISO: string
   spo2Min: number
   spo2Max: number
   spo2Avg: number
@@ -31,6 +33,8 @@ export function normalizeReadingForReport(reading: Reading, threshold?: Threshol
     readingKind,
     displayTime: format(new Date(measuredAt), "PPP p"),
     timeWindow: `${format(new Date(start), "PPP p")} - ${format(new Date(end), "PPP p")}`,
+    timeWindowStartISO: start,
+    timeWindowEndISO: end,
     spo2Min: min,
     spo2Max: max,
     spo2Avg: avg,
