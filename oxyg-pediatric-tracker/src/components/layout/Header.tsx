@@ -12,6 +12,7 @@ export function Header({
   onLogin,
   onLogout,
   onAddReading,
+  showSettings,
 }: {
   patientName: string
   photoUrl?: string | null
@@ -20,6 +21,7 @@ export function Header({
   onLogin: () => void
   onLogout: () => void
   onAddReading: () => void
+  showSettings: boolean
 }) {
   return (
     <header className="sticky top-0 z-10 border-b border-border-soft bg-white/90 px-4 py-3 backdrop-blur lg:px-8">
@@ -38,7 +40,7 @@ export function Header({
         </div>
       </div>
       <nav className="mt-3 flex gap-2 overflow-x-auto pb-1 text-xs lg:hidden">
-        {["/dashboard", "/readings", "/sessions", "/reports", "/settings"].map((to) => (
+        {["/dashboard", "/readings", "/sessions", "/reports", ...(showSettings ? ["/settings"] : [])].map((to) => (
           <NavLink key={to} to={to} className={({ isActive }) => `rounded-full px-3 py-1 ${isActive ? "bg-scarlet-primary text-white" : "bg-scarlet-soft text-scarlet-deep"}`}>
             {to.slice(1)}
           </NavLink>

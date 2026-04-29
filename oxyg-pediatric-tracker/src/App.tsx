@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import { Waves } from "lucide-react"
 import { AppShell } from "@/components/layout/AppShell"
@@ -14,10 +14,10 @@ import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, ge
 import type { ContinuousSession, Patient, Reading } from "@/types/data"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ReadingsPage } from "@/pages/ReadingsPage"
-import { ReportsPage } from "@/pages/ReportsPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { NotFoundPage } from "@/pages/NotFoundPage"
 import type { ReadingInput } from "@/lib/api"
+const ReportsPage = lazy(() => import("@/pages/ReportsPage").then((m) => ({ default: m.ReportsPage })))
 
 function SessionsPage({ sessions }: { sessions: ContinuousSession[] }) {
   if (!sessions.length) return <EmptyState title="No sessions" description="No sessions have been captured yet." Icon={Waves} />
@@ -139,6 +139,7 @@ export function App() {
 
   return (
     <AppShell
+      showSettings={isAuthenticated}
       header={
         <Header
           patientName={patient?.display_name ?? "Pediatric Patient"}
@@ -156,6 +157,7 @@ export function App() {
             }
           }}
           onAddReading={() => { setEditing(null); setModalOpen(true) }}
+          showSettings={isAuthenticated}
         />
       }
     >
@@ -167,8 +169,8 @@ export function App() {
           <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={readings} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
           <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
-          <Route path="/reports" element={<ReportsPage dataVersion={dataVersion} />} />
-          <Route path="/settings" element={<SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPatientUpdated={(patch) => setPatient((prev) => (prev ? { ...prev, ...patch } : prev))} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
+          <Route path="/reports" element={<Suspense fallback={<div className="rounded-2xl border border-border-soft bg-white p-4 text-sm text-text-muted">Loading report builder...</div>}><ReportsPage dataVersion={dataVersion} /></Suspense>} />
+          <Route path="/settings" element={isAuthenticated ? <SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPatientUpdated={(patch) => setPatient((prev) => (prev ? { ...prev, ...patch } : prev))} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} /> : <Navigate to="/dashboard" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

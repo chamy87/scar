@@ -1,15 +1,15 @@
-import html2canvas from "html2canvas"
-import jsPDF from "jspdf"
 import { format } from "date-fns"
 
 export async function exportReportPdf(elementId = "report-pdf-content") {
   const element = document.getElementById(elementId)
   if (!element) throw new Error("Report content not found.")
   document.body.classList.add("exporting-pdf")
-  await new Promise((resolve) => setTimeout(resolve, 300))
+  await new Promise((resolve) => setTimeout(resolve, 120))
   try {
+    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")])
+    const scale = Math.min(1.5, window.devicePixelRatio || 1.5)
     const canvas = await html2canvas(element, {
-      scale: 2,
+      scale,
       useCORS: true,
       backgroundColor: "#ffffff",
       windowWidth: element.scrollWidth,
@@ -31,10 +31,10 @@ export async function exportReportPdf(elementId = "report-pdf-content") {
       const ctx = sliceCanvas.getContext("2d")
       if (!ctx) break
       ctx.drawImage(canvas, 0, renderedHeight, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height)
-      const imgData = sliceCanvas.toDataURL("image/png")
+      const imgData = sliceCanvas.toDataURL("image/jpeg", 0.92)
       const imgHeightMm = sliceCanvas.height / pxPerMm
       if (page > 0) pdf.addPage()
-      pdf.addImage(imgData, "PNG", margin, margin, contentWidth, imgHeightMm)
+      pdf.addImage(imgData, "JPEG", margin, margin, contentWidth, imgHeightMm)
       renderedHeight += sliceCanvas.height
       page += 1
     }

@@ -6,10 +6,10 @@ const items = [
   { to: "/readings", label: "Readings", icon: Activity },
   { to: "/sessions", label: "Sessions", icon: Waves },
   { to: "/reports", label: "Reports", icon: FileBarChart },
-  { to: "/settings", label: "Settings", icon: Settings },
 ]
 
-export function Sidebar() {
+export function Sidebar({ showSettings }: { showSettings: boolean }) {
+  const navItems = showSettings ? [...items, { to: "/settings", label: "Settings", icon: Settings }] : items
   return (
     <aside className="hidden w-72 border-r border-border-soft bg-white/85 p-5 lg:block">
       <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border-soft bg-scarlet-soft/40 p-3">
@@ -20,7 +20,7 @@ export function Sidebar() {
         </div>
       </div>
       <nav className="space-y-2">
-        {items.map(({ to, label, icon: Icon }) => (
+        {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2 text-sm ${isActive ? "bg-scarlet-primary text-white" : "text-text-muted hover:bg-scarlet-soft/70"}`}>
             <Icon className="size-4" />
             {label}
