@@ -1,5 +1,3 @@
-import { NextResponse, type NextRequest } from 'next/server';
-
 const ALLOWLISTED_IPS = [
   // Add trusted IPs here if needed.
 ];
@@ -19,7 +17,7 @@ const suspiciousPatterns = [
   '/.ssh/',
 ];
 
-function getClientIp(request: NextRequest): string {
+function getClientIp(request) {
   const xForwardedFor = request.headers.get('x-forwarded-for');
   if (xForwardedFor) {
     return xForwardedFor.split(',')[0]?.trim() ?? 'unknown';
@@ -30,16 +28,16 @@ function getClientIp(request: NextRequest): string {
     return xRealIp.trim();
   }
 
-  return request.ip ?? 'unknown';
+  return request.headers.get('x-vercel-forwarded-for')?.trim() ?? 'unknown';
 }
 
-function isSuspiciousPath(pathname: string): boolean {
+function isSuspiciousPath(pathname) {
   const normalizedPath = pathname.toLowerCase();
   return suspiciousPatterns.some((pattern) => normalizedPath.includes(pattern));
 }
 
 function forbiddenResponse() {
-  return new NextResponse('Forbidden', {
+  return new Response('Forbidden', {
     status: 403,
     headers: {
       'content-type': 'text/plain; charset=utf-8',
@@ -48,7 +46,7 @@ function forbiddenResponse() {
   });
 }
 
-async function isBlockedIp(ip: string, supabaseUrl: string, serviceRoleKey: string): Promise<boolean> {
+async function isBlockedIp(ip, supabaseUrl, serviceRoleKey) {
   const response = await fetch(
     `${supabaseUrl}/rest/v1/blocked_ips?select=blocked&ip=eq.${encodeURIComponent(ip)}&blocked=eq.true&limit=1`,
     {
@@ -65,17 +63,11 @@ async function isBlockedIp(ip: string, supabaseUrl: string, serviceRoleKey: stri
     return false;
   }
 
-  const data = (await response.json()) as Array<{ blocked?: boolean }>;
-  return data.length > 0 && Boolean(data[0]?.blocked);
+  const data = await response.json();
+  return Array.isArray(data) && data.length > 0 && Boolean(data[0]?.blocked);
 }
 
-async function upsertBlockedIp(
-  ip: string,
-  pathname: string,
-  userAgent: string,
-  supabaseUrl: string,
-  serviceRoleKey: string,
-) {
+async function upsertBlockedIp(ip, pathname, userAgent, supabaseUrl, serviceRoleKey) {
   const payload = {
     ip,
     reason: 'sensitive_path_probe',
@@ -97,12 +89,13 @@ async function upsertBlockedIp(
   });
 }
 
-export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+export default async function middleware(request) {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
   const ip = getClientIp(request);
 
   if (ALLOWLISTED_IPS.includes(ip)) {
-    return NextResponse.next();
+    return;
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -111,12 +104,12 @@ export async function middleware(request: NextRequest) {
 
   if (hasServerSecrets && ip !== 'unknown') {
     try {
-      const blocked = await isBlockedIp(ip, supabaseUrl as string, serviceRoleKey as string);
+      const blocked = await isBlockedIp(ip, supabaseUrl, serviceRoleKey);
       if (blocked) {
         return forbiddenResponse();
       }
     } catch {
-      // Fail open on Supabase lookup error to avoid blocking legitimate traffic.
+      // Fail open if Supabase read fails.
     }
   }
 
@@ -127,18 +120,18 @@ export async function middleware(request: NextRequest) {
           ip,
           pathname,
           request.headers.get('user-agent') ?? 'unknown',
-          supabaseUrl as string,
-          serviceRoleKey as string,
+          supabaseUrl,
+          serviceRoleKey,
         );
       } catch {
-        // Ignore write errors and still block immediately.
+        // Ignore persistence errors and still block immediately.
       }
     }
 
     return forbiddenResponse();
   }
 
-  return NextResponse.next();
+  return;
 }
 
 export const config = {
