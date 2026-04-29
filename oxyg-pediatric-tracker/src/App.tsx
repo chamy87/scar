@@ -5,11 +5,12 @@ import { AppShell } from "@/components/layout/AppShell"
 import { Header } from "@/components/layout/Header"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { ReadingFormModal } from "@/components/ReadingFormModal"
+import { Button } from "@/components/ui/button"
 import { PatientAvatar } from "@/components/patient/PatientAvatar"
 import { PatientPhotoUpload } from "@/components/patient/PatientPhotoUpload"
 import { hasSupabaseEnv } from "@/lib/supabaseClient"
 import { useAuth } from "@/context/AuthContext"
-import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, getSessions, updateReading } from "@/lib/api"
+import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, getSessions, updatePatientProfile, updateReading } from "@/lib/api"
 import type { ContinuousSession, Patient, Reading } from "@/types/data"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ReadingsPage } from "@/pages/ReadingsPage"
@@ -27,14 +28,40 @@ function SettingsPage({
   patient,
   isAuthenticated,
   isAdmin,
+  onPatientUpdated,
   onPhotoUpdated,
 }: {
   patient: Patient | null
   isAuthenticated: boolean
   isAdmin: boolean
+  onPatientUpdated: (patch: Partial<Patient>) => void
   onPhotoUpdated: (url: string) => void
 }) {
   const name = patient?.display_name ?? "Pediatric Patient"
+  const [displayName, setDisplayName] = useState(name)
+  const [dob, setDob] = useState(patient?.dob ?? "")
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState("")
+
+  useEffect(() => {
+    setDisplayName(name)
+    setDob(patient?.dob ?? "")
+  }, [name, patient?.dob])
+
+  const saveProfile = async () => {
+    if (!patient) return
+    setSaving(true)
+    setMessage("")
+    try {
+      await updatePatientProfile(patient.id, { display_name: displayName, dob: dob || null })
+      onPatientUpdated({ display_name: displayName, dob: dob || null })
+      setMessage("Patient profile updated.")
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Update failed")
+    } finally {
+      setSaving(false)
+    }
+  }
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-border-soft bg-white p-4 shadow-sm">
@@ -48,6 +75,19 @@ function SettingsPage({
             {isAuthenticated && !isAdmin && <p className="text-text-muted">Photo changes require admin role.</p>}
           </div>
         </div>
+      </div>
+      <div className="rounded-2xl border border-border-soft bg-white p-4 shadow-sm">
+        <h3 className="mb-3 text-base font-semibold">Patient Details</h3>
+        {isAdmin ? (
+          <div className="grid gap-2 md:grid-cols-3">
+            <input className="rounded-xl border border-border-soft p-2 text-sm" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Display name" />
+            <input className="rounded-xl border border-border-soft p-2 text-sm" type="date" value={dob} onChange={(e) => setDob(e.target.value)} />
+            <Button disabled={saving} onClick={saveProfile}>{saving ? "Saving..." : "Save Details"}</Button>
+          </div>
+        ) : (
+          <p className="text-sm text-text-muted">Only admins can update DOB and profile details.</p>
+        )}
+        {message && <p className="mt-2 text-sm text-text-muted">{message}</p>}
       </div>
       <div className="rounded-2xl border border-border-soft bg-white p-4 text-sm text-text-muted shadow-sm">Configure threshold targets and patient profile fields.</div>
     </div>
@@ -128,7 +168,7 @@ export function App() {
           <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
           <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
           <Route path="/reports" element={<ReportsPage dataVersion={dataVersion} />} />
-          <Route path="/settings" element={<SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
+          <Route path="/settings" element={<SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPatientUpdated={(patch) => setPatient((prev) => (prev ? { ...prev, ...patch } : prev))} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

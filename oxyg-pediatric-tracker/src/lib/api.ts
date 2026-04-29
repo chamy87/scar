@@ -144,6 +144,15 @@ export async function uploadPatientPhoto(patientId: string, file: File): Promise
   return photoUrl
 }
 
+export async function updatePatientProfile(patientId: string, patch: { display_name?: string; dob?: string | null }) {
+  if (!supabase) throw new Error("Missing Supabase configuration")
+  const payload: Record<string, unknown> = {}
+  if (typeof patch.display_name === "string") payload.display_name = patch.display_name
+  if (patch.dob !== undefined) payload.dob = patch.dob
+  const { error } = await supabase.from("patients").update(payload).eq("id", patientId)
+  if (error) throw error
+}
+
 export async function createReading(payload: ReadingInput, userId: string) {
   if (!supabase) throw new Error("Missing Supabase configuration")
   const { error } = await supabase.from("readings").insert({ ...payload, created_by: userId })
