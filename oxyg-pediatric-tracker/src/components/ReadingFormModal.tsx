@@ -28,6 +28,7 @@ export function ReadingFormModal({
   const [signalQuality, setSignalQuality] = useState("")
   const [notes, setNotes] = useState("")
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -46,6 +47,7 @@ export function ReadingFormModal({
     setSignalQuality(initial?.signal_quality ?? "")
     setNotes(initial?.notes ?? "")
     setError("")
+    setSuccess("")
   }, [initial, open])
 
   const avg = useMemo(() => {
@@ -75,6 +77,7 @@ export function ReadingFormModal({
         reading_type: "Spot check",
         measured_start: new Date(measuredAt).toISOString(),
         measured_end: new Date(measuredAt).toISOString(),
+        measured_at: new Date(measuredAt).toISOString(),
         bpm: bpm ? Number(bpm) : null,
         pi: pi ? Number(pi) : null,
         signal_quality: signalQuality || null,
@@ -83,8 +86,14 @@ export function ReadingFormModal({
         recorded_at: new Date(measuredAt).toISOString(),
       }
       setSaving(true)
-      await onSave(payload)
-      setSaving(false)
+      try {
+        await onSave(payload)
+        setSuccess("Reading saved.")
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Save failed")
+      } finally {
+        setSaving(false)
+      }
       return
     }
     const min = Number(spo2Min)
@@ -106,6 +115,7 @@ export function ReadingFormModal({
       reading_type: "Range reading",
       measured_start: startISO,
       measured_end: endISO,
+      measured_at: startISO,
       bpm: bpm ? Number(bpm) : null,
       pi: pi ? Number(pi) : null,
       signal_quality: signalQuality || null,
@@ -114,8 +124,14 @@ export function ReadingFormModal({
       recorded_at: startISO,
     }
     setSaving(true)
-    await onSave(payload)
-    setSaving(false)
+    try {
+      await onSave(payload)
+      setSuccess("Reading saved.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -147,6 +163,7 @@ export function ReadingFormModal({
           <textarea className="rounded-xl border border-border-soft p-2" placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
         </div>
         {error && <p className="mt-2 text-sm text-accent-rose">{error}</p>}
+        {success && <p className="mt-2 text-sm text-emerald-700">{success}</p>}
         <div className="mt-4 flex justify-end gap-2">
           <Button className="bg-gray-500" onClick={onClose}>Cancel</Button>
           <Button disabled={saving} onClick={submit}>{saving ? "Saving..." : "Save"}</Button>

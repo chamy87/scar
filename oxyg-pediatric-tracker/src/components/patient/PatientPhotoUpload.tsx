@@ -3,7 +3,7 @@ import { Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { uploadPatientPhoto } from "@/lib/api"
 
-export function PatientPhotoUpload({ patientId, userId, onUploaded }: { patientId: string; userId: string; onUploaded: (url: string) => void }) {
+export function PatientPhotoUpload({ patientId, onUploaded }: { patientId: string; onUploaded: (url: string) => void }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -13,7 +13,7 @@ export function PatientPhotoUpload({ patientId, userId, onUploaded }: { patientI
     setLoading(true)
     setError("")
     try {
-      const url = await uploadPatientPhoto(patientId, file, userId)
+      const url = await uploadPatientPhoto(patientId, file)
       onUploaded(url)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed")

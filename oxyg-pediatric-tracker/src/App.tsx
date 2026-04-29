@@ -4,9 +4,10 @@ import { Waves } from "lucide-react"
 import { AppShell } from "@/components/layout/AppShell"
 import { Header } from "@/components/layout/Header"
 import { EmptyState } from "@/components/shared/EmptyState"
+import { ReadingFormModal } from "@/components/ReadingFormModal"
 import { hasSupabaseEnv } from "@/lib/supabaseClient"
 import { useAuth } from "@/context/AuthContext"
-import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, getSessions, isAdmin, updateReading } from "@/lib/api"
+import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, getSessions, updateReading } from "@/lib/api"
 import type { ContinuousSession, Patient, Reading } from "@/types/data"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ReadingsPage } from "@/pages/ReadingsPage"
@@ -22,12 +23,11 @@ function SessionsPage({ sessions }: { sessions: ContinuousSession[] }) {
 
 export function App() {
   const navigate = useNavigate()
-  const { user, isAuthenticated, signOut } = useAuth()
+  const { user, isAuthenticated, isAdmin, signOut } = useAuth()
   const [readings, setReadings] = useState<Reading[]>([])
   const [reportReadings, setReportReadings] = useState<Reading[]>([])
   const [sessions, setSessions] = useState<ContinuousSession[]>([])
   const [patient, setPatient] = useState<Patient | null>(null)
-  const [admin, setAdmin] = useState(false)
   const [dataError, setDataError] = useState("")
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Reading | null>(null)
@@ -48,20 +48,22 @@ export function App() {
   }
 
   useEffect(() => { refresh() }, [])
-  useEffect(() => { if (user?.id) isAdmin(user.id).then(setAdmin); else setAdmin(false) }, [user?.id])
-
   const latest = readings[0] ?? null
   const summary = useMemo(() => buildReportSummary(reportReadings), [reportReadings])
 
   const saveReading = async (payload: ReadingInput) => {
-    if (editing) {
-      await updateReading(editing.id, payload)
-    } else if (user?.id) {
-      await createReading(payload, user.id)
+    try {
+      if (editing) {
+        await updateReading(editing.id, payload)
+      } else if (user?.id) {
+        await createReading(payload, user.id)
+      }
+      setModalOpen(false)
+      setEditing(null)
+      await refresh()
+    } catch (error) {
+      setDataError(error instanceof Error ? error.message : "Unable to save reading")
     }
-    setModalOpen(false)
-    setEditing(null)
-    await refresh()
   }
 
   return (
@@ -83,14 +85,15 @@ export function App() {
         {dataError && <div className="rounded-2xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">{dataError}</div>}
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={reportReadings} isAuthenticated={isAuthenticated} isAdmin={admin} userId={user?.id} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
-          <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} modalOpen={modalOpen} editing={editing} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} onCloseModal={() => setModalOpen(false)} onSave={saveReading} />} />
+          <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={reportReadings} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
+          <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
           <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
           <Route path="/reports" element={<ReportsPage readings={reportReadings} summary={summary} start={start} end={end} setStart={setStart} setEnd={setEnd} onRun={async () => { const data = await getReadings(start || undefined, end || undefined); setReportReadings(data) }} isAuthenticated={isAuthenticated} />} />
           <Route path="/settings" element={<div className="rounded-2xl border border-border-soft bg-white p-4 text-sm text-text-muted shadow-sm">Configure threshold targets and patient profile fields.</div>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <ReadingFormModal open={modalOpen} onClose={() => { setModalOpen(false); setEditing(null) }} initial={editing} onSave={saveReading} />
       </div>
     </AppShell>
   )

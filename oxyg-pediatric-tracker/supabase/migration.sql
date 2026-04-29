@@ -120,6 +120,7 @@ drop policy if exists "Authenticated can insert readings" on public.readings;
 drop policy if exists "Authenticated can update readings" on public.readings;
 drop policy if exists "Authenticated can delete readings" on public.readings;
 drop policy if exists "Admin can update patient photo url" on public.patients;
+drop policy if exists "Admins can update patients" on public.patients;
 
 create policy "Public can read profiles" on public.profiles for select to anon, authenticated using (true);
 create policy "Public can read patients" on public.patients for select to anon, authenticated using (true);
@@ -143,7 +144,7 @@ create policy "Authenticated can delete readings" on public.readings
 for delete to authenticated
 using (true);
 
-create policy "Admin can update patient photo url" on public.patients
+create policy "Admins can update patients" on public.patients
 for update to authenticated
 using (
   exists (

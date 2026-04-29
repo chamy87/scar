@@ -12,7 +12,6 @@ export function DashboardPage({
   readings,
   isAuthenticated,
   isAdmin,
-  userId,
   onPhotoUpdated,
 }: {
   patient: Patient | null
@@ -21,12 +20,11 @@ export function DashboardPage({
   readings: Reading[]
   isAuthenticated: boolean
   isAdmin: boolean
-  userId?: string
   onPhotoUpdated: (url: string) => void
 }) {
   return (
     <div className="space-y-5">
-      <PatientSummaryCard patient={patient} latestReading={latest} isAdmin={isAdmin} userId={userId} onPhotoUpdated={onPhotoUpdated} />
+      <PatientSummaryCard patient={patient} latestReading={latest} isAdmin={isAdmin} onPhotoUpdated={onPhotoUpdated} />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Latest SpO₂" value={latest ? `${latest.spo2_avg ?? latest.spo2 ?? "--"}%` : "--"} helper="Oxygen saturation" trend={summary.count > 1 ? `${(summary.maxSpo2 - summary.minSpo2).toFixed(0)} range` : "No trend"} Icon={Droplets} />
         <MetricCard title="Latest BPM" value={latest?.bpm != null ? `${latest.bpm}` : "--"} helper="Heart rate" trend={summary.count > 1 ? `${(summary.maxBpm - summary.minBpm).toFixed(0)} range` : "No trend"} Icon={HeartPulse} />

@@ -15,13 +15,11 @@ export function PatientSummaryCard({
   patient,
   latestReading,
   isAdmin,
-  userId,
   onPhotoUpdated,
 }: {
   patient: Patient | null
   latestReading: Reading | null
   isAdmin: boolean
-  userId?: string
   onPhotoUpdated: (url: string) => void
 }) {
   const name = patient?.display_name ?? "Pediatric Patient"
@@ -48,9 +46,9 @@ export function PatientSummaryCard({
             <HeartPulse className="mr-1 inline size-3" />
             {latestReading ? `Updated ${new Date(latestReading.recorded_at).toLocaleString()}` : "Awaiting first reading"}
           </p>
-          {isAdmin && patient && userId && (
+          {isAdmin && patient && (
             <div className="mt-2">
-              <PatientPhotoUpload patientId={patient.id} userId={userId} onUploaded={onPhotoUpdated} />
+              <PatientPhotoUpload patientId={patient.id} onUploaded={onPhotoUpdated} />
             </div>
           )}
         </div>
