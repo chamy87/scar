@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient"
-import type { ContinuousSession, Patient, Reading, ReportSummary } from "@/types/data"
+import type { ContinuousSession, Patient, Reading, ReportSummary, Threshold } from "@/types/data"
 
 export type ReadingInput = {
   patient_id: string
@@ -29,6 +29,59 @@ export async function getReadings(start?: string, end?: string): Promise<Reading
   const { data, error } = await query
   if (error) throw error
   return (data ?? []) as Reading[]
+}
+
+export async function getPatients(): Promise<Patient[]> {
+  if (!supabase) return []
+  const { data, error } = await supabase.from("patients").select("*").limit(200)
+  if (error) throw error
+  const rows = (data ?? []) as Record<string, unknown>[]
+  return rows.map((row) => ({
+    id: String(row.id ?? ""),
+    display_name: String(row.display_name ?? row.name ?? row.full_name ?? "Pediatric Patient"),
+    dob: row.dob ? String(row.dob) : null,
+    photo_url: row.photo_url ? String(row.photo_url) : null,
+  }))
+}
+
+export async function getThresholdForPatient(patientId: string): Promise<Threshold | null> {
+  if (!supabase) return null
+  const { data, error } = await supabase.from("thresholds").select("*").eq("patient_id", patientId).limit(1).maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  const row = data as Record<string, unknown>
+  const numOrNull = (v: unknown) => {
+    const n = Number(v)
+    return Number.isFinite(n) ? n : null
+  }
+  return {
+    patient_id: patientId,
+    low_spo2_threshold: numOrNull(row.low_spo2_threshold ?? row.min_spo2 ?? row.spo2_low),
+    high_bpm_threshold: numOrNull(row.high_bpm_threshold ?? row.max_bpm ?? row.bpm_high),
+    low_bpm_threshold: numOrNull(row.low_bpm_threshold ?? row.min_bpm ?? row.bpm_low),
+  }
+}
+
+export async function getReportReadings(patientId: string, startISO: string, endISO: string): Promise<Reading[]> {
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from("readings")
+    .select("*")
+    .eq("patient_id", patientId)
+    .or(`and(measured_at.gte.${startISO},measured_at.lte.${endISO}),and(measured_start.lte.${endISO},measured_end.gte.${startISO}),and(recorded_at.gte.${startISO},recorded_at.lte.${endISO})`)
+    .order("recorded_at", { ascending: true })
+  if (!error) return (data ?? []) as Reading[]
+
+  const { data: fallback, error: fallbackError } = await supabase.from("readings").select("*").eq("patient_id", patientId).order("recorded_at", { ascending: true })
+  if (fallbackError) throw fallbackError
+  const start = new Date(startISO).getTime()
+  const end = new Date(endISO).getTime()
+  return ((fallback ?? []) as Reading[]).filter((r) => {
+    const measuredAt = new Date((r as unknown as { measured_at?: string }).measured_at ?? r.measured_start ?? r.recorded_at).getTime()
+    const rs = new Date(r.measured_start ?? (r as unknown as { measured_at?: string }).measured_at ?? r.recorded_at).getTime()
+    const re = new Date(r.measured_end ?? (r as unknown as { measured_at?: string }).measured_at ?? r.recorded_at).getTime()
+    return (measuredAt >= start && measuredAt <= end) || (rs <= end && re >= start)
+  })
 }
 
 export async function getPrimaryPatient(): Promise<Patient | null> {
@@ -78,7 +131,7 @@ export async function uploadPatientPhoto(patientId: string, file: File): Promise
   if (!supabase) throw new Error("Missing Supabase configuration")
   const allowed = ["image/jpeg", "image/png", "image/webp"]
   if (!allowed.includes(file.type)) throw new Error("Use JPG, PNG, or WebP.")
-  if (file.size > 5 * 1024 * 1024) throw new Error("File must be 5 MB or smaller.")
+  if (file.size > 20 * 1024 * 1024) throw new Error("File must be 20 MB or smaller.")
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg"
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-")
   const path = `${patientId}/${Date.now()}-${safeName.replace(/\.[^/.]+$/, "")}.${ext}`

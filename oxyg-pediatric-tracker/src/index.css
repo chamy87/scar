@@ -22,4 +22,11 @@ body {
   .no-print {
     display: none !important;
   }
+  body {
+    background: #fff !important;
+  }
+  .report-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 }

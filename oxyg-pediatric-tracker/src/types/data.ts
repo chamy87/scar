@@ -7,6 +7,7 @@ export type Reading = {
   spo2_max: number | null
   spo2_avg: number | null
   is_spo2_range: boolean
+  reading_type?: string | null
   measured_start: string | null
   measured_end: string | null
   bpm: number | null
@@ -29,6 +30,13 @@ export type ContinuousSession = {
   id: string
   started_at: string
   ended_at: string | null
+}
+
+export type Threshold = {
+  patient_id: string
+  low_spo2_threshold: number | null
+  high_bpm_threshold: number | null
+  low_bpm_threshold: number | null
 }
 
 export type ReportSummary = {

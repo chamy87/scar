@@ -1,51 +1,71 @@
-import { Activity } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useMemo, useState } from "react"
+import { subDays } from "date-fns"
+import { getPatients, getReportReadings, getThresholdForPatient } from "@/lib/api"
+import type { Patient, Threshold } from "@/types/data"
+import type { NormalizedReportReading } from "@/utils/reportCalculations"
+import { calculateReportSummary, normalizeReadingForReport } from "@/utils/reportCalculations"
+import { exportReportPdf } from "@/utils/exportReportPdf"
+import { ReportControls } from "@/components/reports/ReportControls"
+import { ReportHeader } from "@/components/reports/ReportHeader"
+import { ReportSummaryCards } from "@/components/reports/ReportSummaryCards"
+import { ReportClinicalNotes } from "@/components/reports/ReportClinicalNotes"
+import { ReportCharts } from "@/components/reports/ReportCharts"
+import { ReportReadingsTable } from "@/components/reports/ReportReadingsTable"
+import { ReportDisclaimer } from "@/components/reports/ReportDisclaimer"
 import { EmptyState } from "@/components/shared/EmptyState"
-import { TrendChartCard } from "@/components/TrendChartCard"
-import { ReadingsTable } from "@/components/ReadingsTable"
-import type { Reading, ReportSummary } from "@/types/data"
+import { FileBarChart } from "lucide-react"
+import { useEffect } from "react"
 
-export function ReportsPage({
-  readings,
-  summary,
-  start,
-  end,
-  setStart,
-  setEnd,
-  onRun,
-  isAuthenticated,
-}: {
-  readings: Reading[]
-  summary: ReportSummary
-  start: string
-  end: string
-  setStart: (v: string) => void
-  setEnd: (v: string) => void
-  onRun: () => Promise<void>
-  isAuthenticated: boolean
-}) {
-  if (!readings.length) return <EmptyState title="No report data" description="No report data is available for the selected range." Icon={Activity} />
+export function ReportsPage() {
+  const now = new Date()
+  const [patients, setPatients] = useState<Patient[]>([])
+  const [selectedPatientId, setSelectedPatientId] = useState("")
+  const [threshold, setThreshold] = useState<Threshold | null>(null)
+  const [rows, setRows] = useState<NormalizedReportReading[]>([])
+  const [error, setError] = useState("")
+  const [start, setStart] = useState(subDays(now, 7).toISOString().slice(0, 16))
+  const [end, setEnd] = useState(now.toISOString().slice(0, 16))
+
+  useEffect(() => {
+    const load = async () => {
+      const p = await getPatients()
+      setPatients(p)
+      if (p[0]?.id) {
+        setSelectedPatientId(p[0].id)
+      }
+    }
+    load().catch((e) => setError(e instanceof Error ? e.message : "Failed to load patients"))
+  }, [])
+
+  const run = async () => {
+    if (!selectedPatientId) return
+    setError("")
+    try {
+      const [readings, th] = await Promise.all([
+        getReportReadings(selectedPatientId, new Date(start).toISOString(), new Date(end).toISOString()),
+        getThresholdForPatient(selectedPatientId),
+      ])
+      setThreshold(th)
+      setRows(readings.map((r) => normalizeReadingForReport(r, th)))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to generate report")
+    }
+  }
+
+  const selectedPatient = useMemo(() => patients.find((p) => p.id === selectedPatientId) ?? null, [patients, selectedPatientId])
+  const summary = useMemo(() => calculateReportSummary(rows, threshold), [rows, threshold])
+
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border-soft bg-white p-4 shadow-sm">
-        <div className="mb-3 flex flex-wrap items-end gap-2">
-          <label className="text-sm">Start <input type="date" className="ml-2 rounded-lg border border-border-soft p-2" value={start} onChange={(e) => setStart(e.target.value)} /></label>
-          <label className="text-sm">End <input type="date" className="ml-2 rounded-lg border border-border-soft p-2" value={end} onChange={(e) => setEnd(e.target.value)} /></label>
-          <Button onClick={onRun}>Run Report</Button>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-sm md:grid-cols-4">
-          <div>Avg SpO₂: <b>{summary.averageSpo2.toFixed(1)}</b></div>
-          <div>Lowest SpO₂: <b>{summary.minSpo2}</b></div>
-          <div>Highest SpO₂: <b>{summary.maxSpo2}</b></div>
-          <div>Avg BPM: <b>{summary.averageBpm.toFixed(1)}</b></div>
-          <div>Lowest BPM: <b>{summary.minBpm}</b></div>
-          <div>Highest BPM: <b>{summary.maxBpm}</b></div>
-          <div>Readings: <b>{summary.count}</b></div>
-          <div>Flags: <b>{summary.thresholdFlags}</b></div>
-        </div>
+      <ReportControls patients={patients} selectedPatientId={selectedPatientId} onPatientChange={setSelectedPatientId} start={start} end={end} setStart={setStart} setEnd={setEnd} onGenerate={run} onDownload={async () => exportReportPdf("report-pdf-content")} />
+      {error && <div className="rounded-xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">{error}</div>}
+      <div id="report-pdf-content" className="space-y-4 bg-white p-2">
+        <ReportHeader patient={selectedPatient} startISO={new Date(start).toISOString()} endISO={new Date(end).toISOString()} />
+        <ReportDisclaimer />
+        <ReportSummaryCards summary={summary} />
+        <ReportClinicalNotes summary={summary} threshold={threshold} />
+        {rows.length ? <><ReportCharts rows={rows} threshold={threshold} /><ReportReadingsTable rows={rows} /></> : <EmptyState title="No readings found for this report range." description="No readings found for this report range." Icon={FileBarChart} />}
       </div>
-      <TrendChartCard readings={readings} canAdd={isAuthenticated} />
-      <ReadingsTable readings={readings} isAuthenticated={false} onEdit={() => undefined} onDelete={() => undefined} />
     </div>
   )
 }

@@ -58,20 +58,16 @@ export function App() {
   const navigate = useNavigate()
   const { user, isAuthenticated, isAdmin, signOut } = useAuth()
   const [readings, setReadings] = useState<Reading[]>([])
-  const [reportReadings, setReportReadings] = useState<Reading[]>([])
   const [sessions, setSessions] = useState<ContinuousSession[]>([])
   const [patient, setPatient] = useState<Patient | null>(null)
   const [dataError, setDataError] = useState("")
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Reading | null>(null)
-  const [start, setStart] = useState("")
-  const [end, setEnd] = useState("")
 
   const refresh = async () => {
     try {
       const [r, p, s] = await Promise.all([getReadings(), getPrimaryPatient(), getSessions()])
       setReadings(r)
-      setReportReadings(r)
       setPatient(p)
       setSessions(s)
       setDataError("")
@@ -82,7 +78,7 @@ export function App() {
 
   useEffect(() => { refresh() }, [])
   const latest = readings[0] ?? null
-  const summary = useMemo(() => buildReportSummary(reportReadings), [reportReadings])
+  const summary = useMemo(() => buildReportSummary(readings), [readings])
 
   const saveReading = async (payload: ReadingInput) => {
     try {
@@ -126,10 +122,10 @@ export function App() {
         {dataError && <div className="rounded-2xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">{dataError}</div>}
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={reportReadings} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
+          <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={readings} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
           <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
-          <Route path="/reports" element={<ReportsPage readings={reportReadings} summary={summary} start={start} end={end} setStart={setStart} setEnd={setEnd} onRun={async () => { const data = await getReadings(start || undefined, end || undefined); setReportReadings(data) }} isAuthenticated={isAuthenticated} />} />
+          <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
