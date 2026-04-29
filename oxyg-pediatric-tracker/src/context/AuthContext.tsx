@@ -8,6 +8,7 @@ type AuthContextType = {
   isAuthenticated: boolean
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
+  sendMagicLink: (email: string, redirectTo?: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -53,6 +54,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn: async (email: string, password: string) => {
         if (!supabase) throw new Error("Missing Supabase configuration")
         const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+      },
+      sendMagicLink: async (email: string, redirectTo?: string) => {
+        if (!supabase) throw new Error("Missing Supabase configuration")
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: redirectTo,
+          },
+        })
         if (error) throw error
       },
       signOut: async () => {
