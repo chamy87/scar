@@ -54,6 +54,7 @@ CREATE TABLE public.patients (
                                  notes text,
                                  created_at timestamp with time zone NOT NULL DEFAULT now(),
                                  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+                                 photo_url text,
                                  CONSTRAINT patients_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.profiles (
@@ -79,6 +80,14 @@ CREATE TABLE public.readings (
   created_by uuid,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  recorded_at timestamp with time zone DEFAULT now(),
+  spo2_min numeric,
+  spo2_max numeric,
+  spo2_avg numeric,
+  measured_start timestamp with time zone,
+  measured_end timestamp with time zone,
+  is_spo2_range boolean NOT NULL DEFAULT false,
+  waveform text,
   CONSTRAINT readings_pkey PRIMARY KEY (id),
   CONSTRAINT readings_patient_id_fkey FOREIGN KEY (patient_id) REFERENCES public.patients(id),
   CONSTRAINT readings_device_id_fkey FOREIGN KEY (device_id) REFERENCES public.devices(id),

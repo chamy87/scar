@@ -31,16 +31,36 @@ export async function getReadings(start?: string, end?: string): Promise<Reading
 
 export async function getPrimaryPatient(): Promise<Patient | null> {
   if (!supabase) return null
-  const { data, error } = await supabase.from("patients").select("id, display_name, dob, photo_url").order("created_at", { ascending: true }).limit(1).maybeSingle()
+  const { data, error } = await supabase.from("patients").select("*").limit(50)
   if (error) throw error
-  return (data as Patient | null) ?? null
+  const rows = (data ?? []) as Record<string, unknown>[]
+  if (!rows.length) return null
+  const sorted = [...rows].sort((a, b) => {
+    const ax = String(a.created_at ?? a.createdAt ?? "")
+    const bx = String(b.created_at ?? b.createdAt ?? "")
+    return ax.localeCompare(bx)
+  })
+  const row = sorted[0]
+  return {
+    id: String(row.id ?? ""),
+    display_name: String(row.display_name ?? row.name ?? row.full_name ?? "Pediatric Patient"),
+    dob: row.dob ? String(row.dob) : null,
+    photo_url: row.photo_url ? String(row.photo_url) : null,
+  }
 }
 
 export async function getSessions(): Promise<ContinuousSession[]> {
   if (!supabase) return []
-  const { data, error } = await supabase.from("continuous_sessions").select("id, started_at, ended_at").order("started_at", { ascending: false })
+  const { data, error } = await supabase.from("continuous_sessions").select("*")
   if (error) throw error
-  return (data ?? []) as ContinuousSession[]
+  const rows = (data ?? []) as Record<string, unknown>[]
+  return rows
+    .map((row) => ({
+      id: String(row.id ?? ""),
+      started_at: String(row.started_at ?? row.startedAt ?? row.start_time ?? row.created_at ?? new Date().toISOString()),
+      ended_at: row.ended_at ? String(row.ended_at) : row.endedAt ? String(row.endedAt) : row.end_time ? String(row.end_time) : null,
+    }))
+    .sort((a, b) => b.started_at.localeCompare(a.started_at))
 }
 
 export async function isAdmin(userId?: string): Promise<boolean> {
