@@ -12,6 +12,7 @@ export function ReportControls({
   setEnd,
   onGenerate,
   onDownload,
+  onDownloadCsv,
 }: {
   patients: Patient[]
   selectedPatientId: string
@@ -22,6 +23,7 @@ export function ReportControls({
   setEnd: (v: string) => void
   onGenerate: () => Promise<void>
   onDownload: () => Promise<void>
+  onDownloadCsv: () => void
 }) {
   const setQuick = (days: number) => {
     const now = new Date()
@@ -41,7 +43,7 @@ export function ReportControls({
         <Button onClick={onGenerate}>Generate Report</Button>
         <div className="flex gap-2">
           <Button className="bg-scarlet-deep" onClick={onDownload}>Download PDF</Button>
-          <Button className="bg-gray-700" onClick={() => window.print()}>Print</Button>
+          <Button className="bg-gray-700" onClick={onDownloadCsv}>Download CSV</Button>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2 text-xs">

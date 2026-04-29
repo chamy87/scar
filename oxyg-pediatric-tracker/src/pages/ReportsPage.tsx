@@ -5,6 +5,7 @@ import type { Patient, Threshold } from "@/types/data"
 import type { NormalizedReportReading } from "@/utils/reportCalculations"
 import { calculateReportSummary, normalizeReadingForReport } from "@/utils/reportCalculations"
 import { exportReportPdf } from "@/utils/exportReportPdf"
+import { exportReportCsv } from "@/utils/exportReportCsv"
 import { ReportControls } from "@/components/reports/ReportControls"
 import { ReportHeader } from "@/components/reports/ReportHeader"
 import { ReportSummaryCards } from "@/components/reports/ReportSummaryCards"
@@ -16,6 +17,7 @@ import { EmptyState } from "@/components/shared/EmptyState"
 import { FileBarChart } from "lucide-react"
 import { useEffect } from "react"
 import { useLocation } from "react-router-dom"
+import { useInactivityTimer } from "@/hooks/useInactivityTimer"
 
 export function ReportsPage({ dataVersion }: { dataVersion: number }) {
   const location = useLocation()
@@ -25,6 +27,7 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
   const [threshold, setThreshold] = useState<Threshold | null>(null)
   const [rows, setRows] = useState<NormalizedReportReading[]>([])
   const [generated, setGenerated] = useState(false)
+  const [inactivityCleared, setInactivityCleared] = useState(false)
   const [error, setError] = useState("")
   const [downloadError, setDownloadError] = useState("")
   const [downloading, setDownloading] = useState(false)
@@ -53,6 +56,7 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
       setThreshold(th)
       setRows(readings.map((r) => normalizeReadingForReport(r, th)))
       setGenerated(true)
+      setInactivityCleared(false)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate report")
     }
@@ -68,7 +72,19 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
     setRows([])
     setThreshold(null)
     setGenerated(false)
+    setInactivityCleared(false)
   }, [selectedPatientId])
+
+  useInactivityTimer({
+    enabled: generated,
+    timeoutMs: 30 * 60 * 1000,
+    onTimeout: () => {
+      setRows([])
+      setThreshold(null)
+      setGenerated(false)
+      setInactivityCleared(true)
+    },
+  })
 
   const selectedPatient = useMemo(() => patients.find((p) => p.id === selectedPatientId) ?? null, [patients, selectedPatientId])
   const summary = useMemo(() => calculateReportSummary(rows, threshold), [rows, threshold])
@@ -85,7 +101,13 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
         } finally {
           setDownloading(false)
         }
-      }} />
+      }} onDownloadCsv={() => exportReportCsv({
+        patientName: selectedPatient?.display_name ?? "Pediatric Patient",
+        diagnosis: "Tetralogy of Fallot",
+        reportStart: new Date(start).toISOString(),
+        reportEnd: new Date(end).toISOString(),
+        rows,
+      })} />
       {error && <div className="rounded-xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">{error}</div>}
       {downloading && <div className="no-print rounded-xl border border-border-soft bg-white p-3 text-sm text-text-muted">Generating PDF...</div>}
       {downloadError && <div className="no-print rounded-xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">PDF download failed: {downloadError}</div>}
@@ -94,7 +116,12 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
         <ReportDisclaimer />
         <ReportSummaryCards summary={summary} />
         <ReportClinicalNotes summary={summary} threshold={threshold} />
-        {!generated || rows.length ? <><ReportCharts rows={rows} threshold={threshold} /><ReportReadingsTable rows={rows} /></> : <EmptyState title="No readings found for this report range." description="No readings found for this report range." Icon={FileBarChart} />}
+        {inactivityCleared ? (
+          <div className="no-print rounded-2xl border border-border-soft bg-white p-8 text-center shadow-sm">
+            <p className="text-base font-semibold">Report cleared after 30 minutes of inactivity.</p>
+            <button className="mt-3 rounded-xl bg-scarlet-primary px-4 py-2 text-sm font-medium text-white" onClick={() => run()}>Generate Report Again</button>
+          </div>
+        ) : !generated || rows.length ? <><ReportCharts rows={rows} threshold={threshold} /><ReportReadingsTable rows={rows} /></> : <EmptyState title="No readings found for this report range." description="No readings found for this report range." Icon={FileBarChart} />}
       </div>
     </div>
   )

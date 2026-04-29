@@ -1,28 +1,21 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom"
-import { Waves } from "lucide-react"
 import { AppShell } from "@/components/layout/AppShell"
 import { Header } from "@/components/layout/Header"
-import { EmptyState } from "@/components/shared/EmptyState"
 import { ReadingFormModal } from "@/components/ReadingFormModal"
 import { Button } from "@/components/ui/button"
 import { PatientAvatar } from "@/components/patient/PatientAvatar"
 import { PatientPhotoUpload } from "@/components/patient/PatientPhotoUpload"
 import { hasSupabaseEnv } from "@/lib/supabaseClient"
 import { useAuth } from "@/context/AuthContext"
-import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, getSessions, updatePatientProfile, updateReading } from "@/lib/api"
-import type { ContinuousSession, Patient, Reading } from "@/types/data"
+import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, updatePatientProfile, updateReading } from "@/lib/api"
+import type { Patient, Reading } from "@/types/data"
 import { DashboardPage } from "@/pages/DashboardPage"
 import { ReadingsPage } from "@/pages/ReadingsPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { NotFoundPage } from "@/pages/NotFoundPage"
 import type { ReadingInput } from "@/lib/api"
 const ReportsPage = lazy(() => import("@/pages/ReportsPage").then((m) => ({ default: m.ReportsPage })))
-
-function SessionsPage({ sessions }: { sessions: ContinuousSession[] }) {
-  if (!sessions.length) return <EmptyState title="No sessions" description="No sessions have been captured yet." Icon={Waves} />
-  return <table className="w-full rounded-2xl border border-border-soft bg-white text-sm shadow-sm"><thead><tr className="bg-scarlet-soft/60 text-left"><th className="p-3">Started</th><th>Ended</th></tr></thead><tbody>{sessions.map((s) => <tr key={s.id} className="border-t border-border-soft"><td className="p-3">{new Date(s.started_at).toLocaleString()}</td><td>{s.ended_at ? new Date(s.ended_at).toLocaleString() : "-"}</td></tr>)}</tbody></table>
-}
 
 function SettingsPage({
   patient,
@@ -98,7 +91,6 @@ export function App() {
   const navigate = useNavigate()
   const { user, isAuthenticated, isAdmin, signOut } = useAuth()
   const [readings, setReadings] = useState<Reading[]>([])
-  const [sessions, setSessions] = useState<ContinuousSession[]>([])
   const [patient, setPatient] = useState<Patient | null>(null)
   const [dataError, setDataError] = useState("")
   const [dataVersion, setDataVersion] = useState(0)
@@ -107,10 +99,9 @@ export function App() {
 
   const refresh = async () => {
     try {
-      const [r, p, s] = await Promise.all([getReadings(), getPrimaryPatient(), getSessions()])
+      const [r, p] = await Promise.all([getReadings(), getPrimaryPatient()])
       setReadings(r)
       setPatient(p)
-      setSessions(s)
       setDataError("")
       setDataVersion(Date.now())
     } catch (error) {
@@ -168,7 +159,6 @@ export function App() {
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={readings} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
-          <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
           <Route path="/reports" element={<Suspense fallback={<div className="rounded-2xl border border-border-soft bg-white p-4 text-sm text-text-muted">Loading report builder...</div>}><ReportsPage dataVersion={dataVersion} /></Suspense>} />
           <Route path="/settings" element={isAuthenticated ? <SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPatientUpdated={(patch) => setPatient((prev) => (prev ? { ...prev, ...patch } : prev))} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} /> : <Navigate to="/dashboard" />} />
           <Route path="/login" element={<LoginPage />} />

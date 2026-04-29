@@ -1,10 +1,9 @@
-import { Activity, ChartNoAxesCombined, FileBarChart, Gauge, Settings, Waves } from "lucide-react"
+import { Activity, ChartNoAxesCombined, FileBarChart, Gauge, Settings } from "lucide-react"
 import { NavLink } from "react-router-dom"
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: Gauge },
   { to: "/readings", label: "Readings", icon: Activity },
-  { to: "/sessions", label: "Sessions", icon: Waves },
   { to: "/reports", label: "Reports", icon: FileBarChart },
 ]
 
