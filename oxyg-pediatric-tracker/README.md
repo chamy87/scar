@@ -67,6 +67,10 @@ Safety disclaimer shown in app:
      - `SUPABASE_ANON_KEY` or `SUPABASE_PUBLISHABLE_KEY`
      - `NEXT_PUBLIC_SUPABASE_URL`
      - `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - For middleware IP blocking, also set server-only vars:
+     - `SUPABASE_URL`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - Never expose `SUPABASE_SERVICE_ROLE_KEY` in frontend `VITE_*` variables.
 5. Deploy.
 
 ## Notes

@@ -247,3 +247,16 @@ using (
     and p.role = 'admin'
   )
 );
+
+create table if not exists public.blocked_ips (
+  id uuid primary key default gen_random_uuid(),
+  ip text not null unique,
+  reason text not null,
+  first_seen_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now(),
+  request_path text,
+  user_agent text,
+  blocked boolean not null default true
+);
+
+alter table public.blocked_ips enable row level security;
