@@ -25,8 +25,9 @@ Safety disclaimer shown in app:
 1. Install dependencies:
    `npm install`
 2. Add env vars:
-   - Copy `.env.example` to `.env`
+   - Copy `.env.example` to `.env.local`
    - Keep only publishable/anon key in frontend. Never use service role key in `VITE_*`.
+   - Restart dev server after editing `.env.local`.
 3. Start dev server:
    `npm run dev`
 
@@ -34,14 +35,17 @@ Safety disclaimer shown in app:
 1. Open SQL editor in your Supabase project.
 2. Run [`supabase/migration.sql`](./supabase/migration.sql).
 3. Run [`supabase/seed.sql`](./supabase/seed.sql).
-4. In Authentication, enable Email/Password provider.
-5. Create at least one user for authenticated CRUD tests.
+4. In Supabase Dashboard -> Authentication -> Providers, enable Email provider (email/password).
+5. In Supabase Dashboard -> Authentication -> Users, create a user for app login tests.
+6. If email confirmation is enabled, confirm the created user manually before login.
 
 ## Auth + RLS behavior
 - Public users: read-only dashboard/report/readings.
 - Authenticated users: create/update/delete readings.
 - Add/Edit/Delete actions are hidden in UI when logged out.
 - Server-side RLS enforces the same permissions.
+- Login uses `supabase.auth.signInWithPassword`.
+- Logout uses `supabase.auth.signOut`.
 
 ## Vercel deployment
 1. Push repo to GitHub.

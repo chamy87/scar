@@ -11,9 +11,9 @@ export async function getReadings(start?: string, end?: string): Promise<Reading
   return (data ?? []) as Reading[]
 }
 
-export async function createReading(payload: Omit<Reading, "id" | "created_by">) {
+export async function createReading(payload: Omit<Reading, "id" | "created_by">, userId: string) {
   if (!supabase) throw new Error("Missing Supabase configuration")
-  const { error } = await supabase.from("readings").insert(payload)
+  const { error } = await supabase.from("readings").insert({ ...payload, created_by: userId })
   if (error) throw error
 }
 
@@ -46,15 +46,4 @@ export function buildReportSummary(readings: Reading[]): ReportSummary {
     count: readings.length,
     thresholdFlags,
   }
-}
-
-export async function login(email: string, password: string) {
-  if (!supabase) throw new Error("Missing Supabase configuration")
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw error
-}
-
-export async function logout() {
-  if (!supabase) return
-  await supabase.auth.signOut()
 }

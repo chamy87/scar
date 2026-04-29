@@ -78,19 +78,61 @@ alter table waveform_samples enable row level security;
 alter table thresholds enable row level security;
 alter table clinical_notes enable row level security;
 
-create policy "public read profiles" on profiles for select using (true);
-create policy "public read patients" on patients for select using (true);
-create policy "public read devices" on devices for select using (true);
-create policy "public read readings" on readings for select using (true);
-create policy "public read sessions" on continuous_sessions for select using (true);
-create policy "public read waveforms" on waveform_samples for select using (true);
-create policy "public read thresholds" on thresholds for select using (true);
-create policy "public read notes" on clinical_notes for select using (true);
+drop policy if exists "Public can read profiles" on public.profiles;
+drop policy if exists "Public can read patients" on public.patients;
+drop policy if exists "Public can read devices" on public.devices;
+drop policy if exists "Public can read readings" on public.readings;
+drop policy if exists "Public can read continuous_sessions" on public.continuous_sessions;
+drop policy if exists "Public can read waveform_samples" on public.waveform_samples;
+drop policy if exists "Public can read thresholds" on public.thresholds;
+drop policy if exists "Public can read clinical_notes" on public.clinical_notes;
+drop policy if exists "Authenticated can insert readings" on public.readings;
+drop policy if exists "Authenticated can update readings" on public.readings;
+drop policy if exists "Authenticated can delete readings" on public.readings;
 
-create policy "auth write readings" on readings for insert to authenticated with check (auth.uid() is not null);
-create policy "auth update readings" on readings for update to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
-create policy "auth delete readings" on readings for delete to authenticated using (auth.uid() is not null);
+create policy "Public can read profiles" on public.profiles for select to anon, authenticated using (true);
+create policy "Public can read patients" on public.patients for select to anon, authenticated using (true);
+create policy "Public can read devices" on public.devices for select to anon, authenticated using (true);
+create policy "Public can read readings" on public.readings for select to anon, authenticated using (true);
+create policy "Public can read continuous_sessions" on public.continuous_sessions for select to anon, authenticated using (true);
+create policy "Public can read waveform_samples" on public.waveform_samples for select to anon, authenticated using (true);
+create policy "Public can read thresholds" on public.thresholds for select to anon, authenticated using (true);
+create policy "Public can read clinical_notes" on public.clinical_notes for select to anon, authenticated using (true);
 
-create policy "auth write sessions" on continuous_sessions for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
-create policy "auth write thresholds" on thresholds for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
-create policy "auth write notes" on clinical_notes for all to authenticated using (auth.uid() is not null) with check (auth.uid() is not null);
+create policy "Authenticated can insert readings" on public.readings
+for insert to authenticated
+with check (auth.uid() = created_by);
+
+create policy "Authenticated can update readings" on public.readings
+for update to authenticated
+using (true)
+with check (true);
+
+create policy "Authenticated can delete readings" on public.readings
+for delete to authenticated
+using (true);
+
+drop policy if exists "Authenticated can write continuous_sessions" on public.continuous_sessions;
+drop policy if exists "Authenticated can write waveform_samples" on public.waveform_samples;
+drop policy if exists "Authenticated can write thresholds" on public.thresholds;
+drop policy if exists "Authenticated can write clinical_notes" on public.clinical_notes;
+
+create policy "Authenticated can write continuous_sessions" on public.continuous_sessions
+for all to authenticated
+using (true)
+with check (true);
+
+create policy "Authenticated can write waveform_samples" on public.waveform_samples
+for all to authenticated
+using (true)
+with check (true);
+
+create policy "Authenticated can write thresholds" on public.thresholds
+for all to authenticated
+using (true)
+with check (true);
+
+create policy "Authenticated can write clinical_notes" on public.clinical_notes
+for all to authenticated
+using (true)
+with check (true);
