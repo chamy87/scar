@@ -5,6 +5,8 @@ import { AppShell } from "@/components/layout/AppShell"
 import { Header } from "@/components/layout/Header"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { ReadingFormModal } from "@/components/ReadingFormModal"
+import { PatientAvatar } from "@/components/patient/PatientAvatar"
+import { PatientPhotoUpload } from "@/components/patient/PatientPhotoUpload"
 import { hasSupabaseEnv } from "@/lib/supabaseClient"
 import { useAuth } from "@/context/AuthContext"
 import { buildReportSummary, createReading, deleteReading, getPrimaryPatient, getReadings, getSessions, updateReading } from "@/lib/api"
@@ -19,6 +21,37 @@ import type { ReadingInput } from "@/lib/api"
 function SessionsPage({ sessions }: { sessions: ContinuousSession[] }) {
   if (!sessions.length) return <EmptyState title="No sessions" description="No sessions have been captured yet." Icon={Waves} />
   return <table className="w-full rounded-2xl border border-border-soft bg-white text-sm shadow-sm"><thead><tr className="bg-scarlet-soft/60 text-left"><th className="p-3">Started</th><th>Ended</th></tr></thead><tbody>{sessions.map((s) => <tr key={s.id} className="border-t border-border-soft"><td className="p-3">{new Date(s.started_at).toLocaleString()}</td><td>{s.ended_at ? new Date(s.ended_at).toLocaleString() : "-"}</td></tr>)}</tbody></table>
+}
+
+function SettingsPage({
+  patient,
+  isAuthenticated,
+  isAdmin,
+  onPhotoUpdated,
+}: {
+  patient: Patient | null
+  isAuthenticated: boolean
+  isAdmin: boolean
+  onPhotoUpdated: (url: string) => void
+}) {
+  const name = patient?.display_name ?? "Pediatric Patient"
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-border-soft bg-white p-4 shadow-sm">
+        <h3 className="mb-3 text-base font-semibold">Patient Photo</h3>
+        <div className="flex flex-wrap items-center gap-4">
+          <PatientAvatar name={name} photoUrl={patient?.photo_url} size="lg" />
+          <div className="space-y-2 text-sm">
+            <p className="text-text-muted">Visible to everyone in the dashboard header and summary card.</p>
+            {isAdmin && patient && <PatientPhotoUpload patientId={patient.id} onUploaded={onPhotoUpdated} />}
+            {!isAuthenticated && <p className="text-text-muted">Log in as an admin user to change the photo.</p>}
+            {isAuthenticated && !isAdmin && <p className="text-text-muted">Photo changes require admin role.</p>}
+          </div>
+        </div>
+      </div>
+      <div className="rounded-2xl border border-border-soft bg-white p-4 text-sm text-text-muted shadow-sm">Configure threshold targets and patient profile fields.</div>
+    </div>
+  )
 }
 
 export function App() {
@@ -97,7 +130,7 @@ export function App() {
           <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
           <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
           <Route path="/reports" element={<ReportsPage readings={reportReadings} summary={summary} start={start} end={end} setStart={setStart} setEnd={setEnd} onRun={async () => { const data = await getReadings(start || undefined, end || undefined); setReportReadings(data) }} isAuthenticated={isAuthenticated} />} />
-          <Route path="/settings" element={<div className="rounded-2xl border border-border-soft bg-white p-4 text-sm text-text-muted shadow-sm">Configure threshold targets and patient profile fields.</div>} />
+          <Route path="/settings" element={<SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

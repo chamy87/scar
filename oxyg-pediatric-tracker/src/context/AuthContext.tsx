@@ -30,6 +30,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const client = supabase
     let active = true
+    const loadProfile = async (uid?: string) => {
+      if (!client || !uid) {
+        if (active) setProfile(null)
+        return
+      }
+      const { data: p } = await client.from("profiles").select("id, role").eq("id", uid).maybeSingle()
+      if (active) setProfile((p as Profile | null) ?? null)
+    }
+
     async function load() {
       if (!client) {
         setLoading(false)
@@ -39,26 +48,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!active) return
       setSession(data.session)
       setUser(data.session?.user ?? null)
-      if (data.session?.user?.id) {
-        const { data: p } = await client.from("profiles").select("id, role").eq("id", data.session.user.id).maybeSingle()
-        if (active) setProfile((p as Profile | null) ?? null)
-      } else {
-        setProfile(null)
-      }
+      await loadProfile(data.session?.user?.id)
       setLoading(false)
     }
     load()
     if (!client) return
-    const { data } = client.auth.onAuthStateChange(async (_event, nextSession) => {
+    const { data } = client.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
       setUser(nextSession?.user ?? null)
-      if (nextSession?.user?.id) {
-        const { data: p } = await client.from("profiles").select("id, role").eq("id", nextSession.user.id).maybeSingle()
-        setProfile((p as Profile | null) ?? null)
-      } else {
-        setProfile(null)
-      }
       setLoading(false)
+      void loadProfile(nextSession?.user?.id)
     })
     return () => {
       active = false
