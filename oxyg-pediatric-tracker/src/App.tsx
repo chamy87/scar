@@ -75,7 +75,15 @@ export function App() {
           email={user?.email}
           isAuthenticated={isAuthenticated}
           onLogin={() => navigate("/login", { state: { from: window.location.pathname } })}
-          onLogout={async () => { await signOut(); navigate("/dashboard") }}
+          onLogout={async () => {
+            try {
+              await signOut()
+            } catch (error) {
+              setDataError(error instanceof Error ? error.message : "Logout failed")
+            } finally {
+              navigate("/dashboard")
+            }
+          }}
           onAddReading={() => { setEditing(null); setModalOpen(true) }}
         />
       }
