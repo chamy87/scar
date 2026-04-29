@@ -9,6 +9,19 @@ export type Reading = {
   created_by: string | null
 }
 
+export type Patient = {
+  id: string
+  display_name: string
+  dob: string | null
+  photo_url: string | null
+}
+
+export type ContinuousSession = {
+  id: string
+  started_at: string
+  ended_at: string | null
+}
+
 export type ReportSummary = {
   averageSpo2: number
   minSpo2: number

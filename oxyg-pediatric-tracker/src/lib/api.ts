@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient"
-import type { Reading, ReportSummary } from "@/types/data"
+import type { ContinuousSession, Patient, Reading, ReportSummary } from "@/types/data"
 
 export async function getReadings(start?: string, end?: string): Promise<Reading[]> {
   if (!supabase) return []
@@ -9,6 +9,45 @@ export async function getReadings(start?: string, end?: string): Promise<Reading
   const { data, error } = await query
   if (error) throw error
   return (data ?? []) as Reading[]
+}
+
+export async function getPrimaryPatient(): Promise<Patient | null> {
+  if (!supabase) return null
+  const { data, error } = await supabase.from("patients").select("id, display_name, dob, photo_url").order("created_at", { ascending: true }).limit(1).maybeSingle()
+  if (error) throw error
+  return (data as Patient | null) ?? null
+}
+
+export async function getSessions(): Promise<ContinuousSession[]> {
+  if (!supabase) return []
+  const { data, error } = await supabase.from("continuous_sessions").select("id, started_at, ended_at").order("started_at", { ascending: false })
+  if (error) throw error
+  return (data ?? []) as ContinuousSession[]
+}
+
+export async function isAdmin(userId?: string): Promise<boolean> {
+  if (!supabase) return false
+  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id
+  if (!uid) return false
+  const { data, error } = await supabase.from("profiles").select("role").eq("id", uid).maybeSingle()
+  if (error) return false
+  return data?.role === "admin"
+}
+
+export async function uploadPatientPhoto(patientId: string, file: File, userId: string): Promise<string> {
+  if (!supabase) throw new Error("Missing Supabase configuration")
+  const allowed = ["image/jpeg", "image/png", "image/webp"]
+  if (!allowed.includes(file.type)) throw new Error("Use JPG, PNG, or WebP.")
+  if (file.size > 5 * 1024 * 1024) throw new Error("File must be 5 MB or smaller.")
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg"
+  const path = `${patientId}/${userId}-${Date.now()}.${ext}`
+  const { error: uploadError } = await supabase.storage.from("patient-photos").upload(path, file, { upsert: true })
+  if (uploadError) throw uploadError
+  const { data } = supabase.storage.from("patient-photos").getPublicUrl(path)
+  const photoUrl = data.publicUrl
+  const { error: updateError } = await supabase.from("patients").update({ photo_url: photoUrl }).eq("id", patientId)
+  if (updateError) throw updateError
+  return photoUrl
 }
 
 export async function createReading(payload: Omit<Reading, "id" | "created_by">, userId: string) {

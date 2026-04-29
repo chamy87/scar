@@ -12,8 +12,11 @@ create table if not exists patients (
   external_id text unique,
   display_name text not null,
   dob date,
+  photo_url text,
   created_at timestamptz default now()
 );
+
+alter table public.patients add column if not exists photo_url text;
 
 create table if not exists devices (
   id uuid primary key default gen_random_uuid(),
@@ -136,3 +139,65 @@ create policy "Authenticated can write clinical_notes" on public.clinical_notes
 for all to authenticated
 using (true)
 with check (true);
+
+insert into storage.buckets (id, name, public)
+values ('patient-photos', 'patient-photos', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Public can view patient photos" on storage.objects;
+drop policy if exists "Admin can upload patient photos" on storage.objects;
+drop policy if exists "Admin can update patient photos" on storage.objects;
+drop policy if exists "Admin can delete patient photos" on storage.objects;
+
+create policy "Public can view patient photos"
+on storage.objects
+for select
+to anon, authenticated
+using (bucket_id = 'patient-photos');
+
+create policy "Admin can upload patient photos"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'patient-photos'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+    and p.role = 'admin'
+  )
+);
+
+create policy "Admin can update patient photos"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'patient-photos'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+    and p.role = 'admin'
+  )
+)
+with check (
+  bucket_id = 'patient-photos'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+    and p.role = 'admin'
+  )
+);
+
+create policy "Admin can delete patient photos"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'patient-photos'
+  and exists (
+    select 1 from public.profiles p
+    where p.id = auth.uid()
+    and p.role = 'admin'
+  )
+);

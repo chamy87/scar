@@ -46,6 +46,15 @@ Safety disclaimer shown in app:
 - Server-side RLS enforces the same permissions.
 - Login uses `supabase.auth.signInWithPassword`.
 - Logout uses `supabase.auth.signOut`.
+- Patient photos are stored in Supabase Storage bucket `patient-photos`.
+- Only users with `public.profiles.role = 'admin'` can upload/update/delete patient photos.
+- Public users can view patient photos.
+
+## Admin setup for photo upload
+1. Ensure the logged-in user has a `profiles` row with role `admin`.
+2. Example:
+   `update public.profiles set role = 'admin' where id = '<auth_user_uuid>';`
+3. Re-run [`supabase/migration.sql`](./supabase/migration.sql) after schema/storage policy updates.
 
 ## Vercel deployment
 1. Push repo to GitHub.
