@@ -1,9 +1,9 @@
 import type { ReturnTypeSummary } from "@/components/reports/types"
 
 export function ReportSummaryCards({ summary }: { summary: ReturnTypeSummary }) {
-  const card = "report-block rounded-2xl border border-border-soft bg-white p-4 shadow-sm"
+  const card = "summary-card rounded-xl border border-border-soft bg-white p-3 shadow-sm"
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+    <div className="report-section grid gap-2 md:grid-cols-2 xl:grid-cols-4">
       <div className={card}>
         <h3 className="mb-2 font-semibold">SpO₂</h3>
         <p className="text-sm">Avg {summary.spo2.avg.toFixed(1)}%</p>

@@ -4,7 +4,7 @@ import type { Threshold } from "@/types/data"
 export function ReportClinicalNotes({ summary, threshold }: { summary: ReturnTypeSummary; threshold: Threshold | null }) {
   const low = threshold?.low_spo2_threshold
   return (
-    <div className="report-block rounded-2xl border border-border-soft bg-white p-4 shadow-sm">
+    <div className="report-section rounded-2xl border border-border-soft bg-white p-4 shadow-sm">
       <h3 className="mb-2 font-semibold">Report Notes for Cardiologist</h3>
       <ul className="list-disc space-y-1 pl-5 text-sm text-text-main">
         <li>Lowest recorded SpO₂ during this range: {summary.spo2.min.toFixed(1)}%.</li>

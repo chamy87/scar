@@ -24,6 +24,7 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
   const [selectedPatientId, setSelectedPatientId] = useState("")
   const [threshold, setThreshold] = useState<Threshold | null>(null)
   const [rows, setRows] = useState<NormalizedReportReading[]>([])
+  const [generated, setGenerated] = useState(false)
   const [error, setError] = useState("")
   const [start, setStart] = useState(subDays(now, 7).toISOString().slice(0, 16))
   const [end, setEnd] = useState(now.toISOString().slice(0, 16))
@@ -49,6 +50,7 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
       ])
       setThreshold(th)
       setRows(readings.map((r) => normalizeReadingForReport(r, th)))
+      setGenerated(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate report")
     }
@@ -60,6 +62,12 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataVersion, selectedPatientId, location.pathname])
 
+  useEffect(() => {
+    setRows([])
+    setThreshold(null)
+    setGenerated(false)
+  }, [selectedPatientId])
+
   const selectedPatient = useMemo(() => patients.find((p) => p.id === selectedPatientId) ?? null, [patients, selectedPatientId])
   const summary = useMemo(() => calculateReportSummary(rows, threshold), [rows, threshold])
 
@@ -67,12 +75,12 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
     <div className="space-y-4">
       <ReportControls patients={patients} selectedPatientId={selectedPatientId} onPatientChange={setSelectedPatientId} start={start} end={end} setStart={setStart} setEnd={setEnd} onGenerate={run} onDownload={async () => exportReportPdf("report-pdf-content")} />
       {error && <div className="rounded-xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">{error}</div>}
-      <div id="report-pdf-content" className="space-y-4 bg-white p-2">
+      <div id="report-pdf-content" className="mx-auto max-w-[980px] space-y-4 bg-white p-2">
         <ReportHeader patient={selectedPatient} startISO={new Date(start).toISOString()} endISO={new Date(end).toISOString()} />
         <ReportDisclaimer />
         <ReportSummaryCards summary={summary} />
         <ReportClinicalNotes summary={summary} threshold={threshold} />
-        {rows.length ? <><ReportCharts rows={rows} threshold={threshold} /><ReportReadingsTable rows={rows} /></> : <EmptyState title="No readings found for this report range." description="No readings found for this report range." Icon={FileBarChart} />}
+        {!generated || rows.length ? <><ReportCharts rows={rows} threshold={threshold} /><ReportReadingsTable rows={rows} /></> : <EmptyState title="No readings found for this report range." description="No readings found for this report range." Icon={FileBarChart} />}
       </div>
     </div>
   )
