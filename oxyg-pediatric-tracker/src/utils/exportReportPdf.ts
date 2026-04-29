@@ -6,7 +6,11 @@ export async function exportReportPdf(elementId = "report-pdf-content") {
   document.body.classList.add("exporting-pdf")
   await new Promise((resolve) => setTimeout(resolve, 120))
   try {
-    const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")])
+    const [{ default: html2canvas }, jsPdfModule] = await Promise.all([import("html2canvas-pro"), import("jspdf")])
+    const JsPdfCtor =
+      (jsPdfModule as { jsPDF?: new (...args: unknown[]) => { internal: { pageSize: { getWidth: () => number; getHeight: () => number } }; addImage: (...args: unknown[]) => void; addPage: () => void; save: (filename: string) => void } }).jsPDF ??
+      (jsPdfModule as { default?: { jsPDF?: new (...args: unknown[]) => { internal: { pageSize: { getWidth: () => number; getHeight: () => number } }; addImage: (...args: unknown[]) => void; addPage: () => void; save: (filename: string) => void } } }).default?.jsPDF
+    if (!JsPdfCtor) throw new Error("jsPDF failed to load.")
     const scale = Math.min(1.5, window.devicePixelRatio || 1.5)
     const canvas = await html2canvas(element, {
       scale,
@@ -14,7 +18,7 @@ export async function exportReportPdf(elementId = "report-pdf-content") {
       backgroundColor: "#ffffff",
       windowWidth: element.scrollWidth,
     })
-    const pdf = new jsPDF("p", "mm", "letter")
+    const pdf = new JsPdfCtor("p", "mm", "letter")
     const pageWidth = pdf.internal.pageSize.getWidth()
     const pageHeight = pdf.internal.pageSize.getHeight()
     const margin = 10
@@ -39,6 +43,7 @@ export async function exportReportPdf(elementId = "report-pdf-content") {
       page += 1
     }
     pdf.save(`scarlett-cardiology-report-${format(new Date(), "yyyy-MM-dd")}.pdf`)
+    return
   } finally {
     document.body.classList.remove("exporting-pdf")
   }

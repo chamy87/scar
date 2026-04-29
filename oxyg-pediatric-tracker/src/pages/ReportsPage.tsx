@@ -26,6 +26,8 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
   const [rows, setRows] = useState<NormalizedReportReading[]>([])
   const [generated, setGenerated] = useState(false)
   const [error, setError] = useState("")
+  const [downloadError, setDownloadError] = useState("")
+  const [downloading, setDownloading] = useState(false)
   const [start, setStart] = useState(subDays(now, 7).toISOString().slice(0, 16))
   const [end, setEnd] = useState(now.toISOString().slice(0, 16))
 
@@ -73,8 +75,20 @@ export function ReportsPage({ dataVersion }: { dataVersion: number }) {
 
   return (
     <div className="space-y-4">
-      <ReportControls patients={patients} selectedPatientId={selectedPatientId} onPatientChange={setSelectedPatientId} start={start} end={end} setStart={setStart} setEnd={setEnd} onGenerate={run} onDownload={async () => exportReportPdf("report-pdf-content")} />
+      <ReportControls patients={patients} selectedPatientId={selectedPatientId} onPatientChange={setSelectedPatientId} start={start} end={end} setStart={setStart} setEnd={setEnd} onGenerate={run} onDownload={async () => {
+        setDownloadError("")
+        setDownloading(true)
+        try {
+          await exportReportPdf("report-pdf-content")
+        } catch (e) {
+          setDownloadError(e instanceof Error ? e.message : "PDF export failed.")
+        } finally {
+          setDownloading(false)
+        }
+      }} />
       {error && <div className="rounded-xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">{error}</div>}
+      {downloading && <div className="no-print rounded-xl border border-border-soft bg-white p-3 text-sm text-text-muted">Generating PDF...</div>}
+      {downloadError && <div className="no-print rounded-xl border border-accent-rose bg-white p-3 text-sm text-accent-rose">PDF download failed: {downloadError}</div>}
       <div id="report-pdf-content" className="mx-auto max-w-[980px] space-y-4 bg-white p-2">
         <ReportHeader patient={selectedPatient} startISO={new Date(start).toISOString()} endISO={new Date(end).toISOString()} />
         <ReportDisclaimer />
