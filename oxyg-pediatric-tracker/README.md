@@ -61,8 +61,12 @@ Safety disclaimer shown in app:
 2. Import project into Vercel.
 3. Framework preset: `Vite`.
 4. Set env vars in Vercel Project Settings:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
+   - Either `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`
+   - Or native integration names already present in many projects:
+     - `SUPABASE_URL`
+     - `SUPABASE_ANON_KEY` or `SUPABASE_PUBLISHABLE_KEY`
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 5. Deploy.
 
 ## Notes
