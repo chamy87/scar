@@ -15,8 +15,10 @@ import { ReportDisclaimer } from "@/components/reports/ReportDisclaimer"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { FileBarChart } from "lucide-react"
 import { useEffect } from "react"
+import { useLocation } from "react-router-dom"
 
-export function ReportsPage() {
+export function ReportsPage({ dataVersion }: { dataVersion: number }) {
+  const location = useLocation()
   const now = new Date()
   const [patients, setPatients] = useState<Patient[]>([])
   const [selectedPatientId, setSelectedPatientId] = useState("")
@@ -51,6 +53,12 @@ export function ReportsPage() {
       setError(e instanceof Error ? e.message : "Failed to generate report")
     }
   }
+
+  useEffect(() => {
+    if (!selectedPatientId) return
+    run().catch((e) => setError(e instanceof Error ? e.message : "Failed to refresh report"))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataVersion, selectedPatientId, location.pathname])
 
   const selectedPatient = useMemo(() => patients.find((p) => p.id === selectedPatientId) ?? null, [patients, selectedPatientId])
   const summary = useMemo(() => calculateReportSummary(rows, threshold), [rows, threshold])

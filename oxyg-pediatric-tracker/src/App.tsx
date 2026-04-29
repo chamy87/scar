@@ -61,6 +61,7 @@ export function App() {
   const [sessions, setSessions] = useState<ContinuousSession[]>([])
   const [patient, setPatient] = useState<Patient | null>(null)
   const [dataError, setDataError] = useState("")
+  const [dataVersion, setDataVersion] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Reading | null>(null)
 
@@ -71,6 +72,7 @@ export function App() {
       setPatient(p)
       setSessions(s)
       setDataError("")
+      setDataVersion(Date.now())
     } catch (error) {
       setDataError(error instanceof Error ? error.message : "Failed to load data")
     }
@@ -125,7 +127,7 @@ export function App() {
           <Route path="/dashboard" element={<DashboardPage patient={patient} latest={latest} summary={summary} readings={readings} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/readings" element={<ReadingsPage readings={readings} isAuthenticated={isAuthenticated} onEdit={(r) => { setEditing(r); setModalOpen(true) }} onDelete={async (id) => { await deleteReading(id); await refresh() }} />} />
           <Route path="/sessions" element={<SessionsPage sessions={sessions} />} />
-          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/reports" element={<ReportsPage dataVersion={dataVersion} />} />
           <Route path="/settings" element={<SettingsPage patient={patient} isAuthenticated={isAuthenticated} isAdmin={isAdmin} onPhotoUpdated={(url) => setPatient((prev) => (prev ? { ...prev, photo_url: url } : prev))} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
