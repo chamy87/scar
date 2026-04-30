@@ -18,11 +18,6 @@ function getTrend(values: number[]) {
 
 export function ReportCharts({ rows, threshold }: { rows: NormalizedReportReading[]; threshold: Threshold | null }) {
   const [activeTab, setActiveTab] = useState<ChartTab>("spo2")
-
-  if (!rows.length) {
-    return <EmptyState title="No data available for selected range" description="No data available for selected range" Icon={LineChartIcon} />
-  }
-
   const spo2Data = useMemo(
     () =>
       rows.map((r) => ({
@@ -52,6 +47,10 @@ export function ReportCharts({ rows, threshold }: { rows: NormalizedReportReadin
   const min = values.length ? Math.min(...values) : null
   const max = values.length ? Math.max(...values) : null
   const count = values.length
+
+  if (!rows.length) {
+    return <EmptyState title="No data available for selected range" description="No data available for selected range" Icon={LineChartIcon} />
+  }
 
   const chartCard = "report-chart-card rounded-2xl border border-border-soft bg-white p-4 shadow-sm"
 
