@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import type { Reading } from "@/types/data"
 import type { ReadingInput } from "@/lib/api"
+import { fromCentralInputValue, nowCentralInputValue, toCentralInputValue } from "@/lib/utils"
 
 type Mode = "single" | "range"
 
@@ -38,10 +39,11 @@ export function ReadingFormModal({
     setSpo2(initial?.spo2_avg?.toString() ?? "")
     setSpo2Min(initial?.spo2_min?.toString() ?? "")
     setSpo2Max(initial?.spo2_max?.toString() ?? "")
-    const at = initial?.measured_start ?? initial?.recorded_at ?? new Date().toISOString()
-    setMeasuredAt(at.slice(0, 16))
-    setMeasuredStart((initial?.measured_start ?? at).slice(0, 16))
-    setMeasuredEnd((initial?.measured_end ?? at).slice(0, 16))
+    const at = initial?.measured_start ?? initial?.recorded_at
+    const atValue = at ? toCentralInputValue(at) : nowCentralInputValue()
+    setMeasuredAt(atValue)
+    setMeasuredStart(initial?.measured_start ? toCentralInputValue(initial.measured_start) : atValue)
+    setMeasuredEnd(initial?.measured_end ? toCentralInputValue(initial.measured_end) : atValue)
     setBpm(initial?.bpm?.toString() ?? "")
     setPi(initial?.pi?.toString() ?? "")
     setSignalQuality(initial?.signal_quality ?? "")
@@ -66,6 +68,7 @@ export function ReadingFormModal({
       const v = Number(spo2)
       if (!Number.isFinite(v) || v < 0 || v > 100) return setError("SpO₂ is required and must be between 0 and 100.")
       if (!measuredAt) return setError("Measured at is required.")
+      const measuredISO = fromCentralInputValue(measuredAt)
       const payload: ReadingInput = {
         patient_id: patientId,
         device_id: initial?.device_id ?? null,
@@ -75,15 +78,15 @@ export function ReadingFormModal({
         spo2_avg: v,
         is_spo2_range: false,
         reading_type: "Spot check",
-        measured_start: new Date(measuredAt).toISOString(),
-        measured_end: new Date(measuredAt).toISOString(),
-        measured_at: new Date(measuredAt).toISOString(),
+        measured_start: measuredISO,
+        measured_end: measuredISO,
+        measured_at: measuredISO,
         bpm: bpm ? Number(bpm) : null,
         pi: pi ? Number(pi) : null,
         signal_quality: signalQuality || null,
         notes: notes || null,
         waveform: null,
-        recorded_at: new Date(measuredAt).toISOString(),
+        recorded_at: measuredISO,
       }
       setSaving(true)
       try {
@@ -101,8 +104,8 @@ export function ReadingFormModal({
     if (!Number.isFinite(min) || !Number.isFinite(max)) return setError("SpO₂ minimum and maximum are required.")
     if (min < 0 || max > 100 || min > max) return setError("SpO₂ min/max must be 0–100 and minimum must be less than or equal to maximum.")
     if (!measuredStart || !measuredEnd) return setError("Start and end time are required.")
-    const startISO = new Date(measuredStart).toISOString()
-    const endISO = new Date(measuredEnd).toISOString()
+    const startISO = fromCentralInputValue(measuredStart)
+    const endISO = fromCentralInputValue(measuredEnd)
     if (startISO > endISO) return setError("Start time must be before or equal to end time.")
     const payload: ReadingInput = {
       patient_id: patientId,
@@ -146,13 +149,16 @@ export function ReadingFormModal({
           {mode === "single" ? (
             <>
               <input className="rounded-xl border border-border-soft p-2" placeholder="SpO₂ value (required)" value={spo2} onChange={(e) => setSpo2(e.target.value)} />
+              <label className="text-xs text-text-muted">Measured at (Central Time)</label>
               <input className="rounded-xl border border-border-soft p-2" type="datetime-local" value={measuredAt} onChange={(e) => setMeasuredAt(e.target.value)} />
             </>
           ) : (
             <>
               <input className="rounded-xl border border-border-soft p-2" placeholder="SpO₂ minimum (required)" value={spo2Min} onChange={(e) => setSpo2Min(e.target.value)} />
               <input className="rounded-xl border border-border-soft p-2" placeholder="SpO₂ maximum (required)" value={spo2Max} onChange={(e) => setSpo2Max(e.target.value)} />
+              <label className="text-xs text-text-muted">Start (Central Time)</label>
               <input className="rounded-xl border border-border-soft p-2" type="datetime-local" value={measuredStart} onChange={(e) => setMeasuredStart(e.target.value)} />
+              <label className="text-xs text-text-muted">End (Central Time)</label>
               <input className="rounded-xl border border-border-soft p-2" type="datetime-local" value={measuredEnd} onChange={(e) => setMeasuredEnd(e.target.value)} />
               <p className="text-xs text-text-muted">Average SpO₂: {Number.isFinite(avg) ? avg.toFixed(1) : "0.0"}%</p>
             </>
