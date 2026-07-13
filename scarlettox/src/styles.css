@@ -1,0 +1,20 @@
+@import './tokens/fonts.css';
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/effects.css';
+@import './tokens/base.css';
+
+/* Page-level keyframes (from the website UI kit) */
+@keyframes fh-heartbeat {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.025); }
+  24% { transform: scale(1); }
+}
+@keyframes fh-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; }
+}

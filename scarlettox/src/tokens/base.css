@@ -1,0 +1,14 @@
+/* ScarlettOx — base element styles */
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font: var(--text-body-md);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { color: var(--text-heading); margin: 0; }
+p { margin: 0; }
+a { color: var(--text-link); text-decoration-color: color-mix(in oklch, currentColor 40%, transparent); text-underline-offset: 3px; transition: color var(--duration-fast) var(--ease-out); }
+a:hover { color: var(--text-link-hover); }
+::selection { background: var(--coral-100); }
+:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius: var(--radius-sm); }

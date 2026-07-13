@@ -1,0 +1,63 @@
+/* ScarlettOx — color tokens */
+:root {
+  /* Base palette */
+  --coral-100: #FCE4DE;
+  --coral-300: #F5A08F;
+  --coral-500: #E85C4A;
+  --coral-600: #D34A38;
+  --coral-700: #B03A2B;
+
+  --teal-100: #DCEEF0;
+  --teal-300: #8FC3CB;
+  --teal-500: #3E8E9E;
+  --teal-700: #2C6873;
+
+  --gold-100: #FBEBD6;
+  --gold-400: #F4A259;
+  --gold-600: #D97F2E;
+
+  --ink-900: #33272E;
+  --ink-700: #55464E;
+  --ink-500: #7D6E75;
+  --ink-300: #B6A9AF;
+
+  --cream-50: #FDFAF5;
+  --cream-100: #FBF6EF;
+  --cream-200: #F4EBDF;
+  --white: #FFFFFF;
+
+  /* Semantic */
+  --success: #3E8E5A;
+  --success-bg: #E2F1E7;
+  --warning: #D9822B;
+  --warning-bg: #FBEBD6;
+  --error: #C6473E;
+  --error-bg: #FAE3E1;
+  --info: #3E8E9E;
+  --info-bg: #DCEEF0;
+
+  /* Aliases */
+  --brand: var(--coral-500);
+  --brand-strong: var(--coral-600);
+  --brand-soft: var(--coral-100);
+  --accent: var(--teal-500);
+  --accent-soft: var(--teal-100);
+  --highlight: var(--gold-400);
+
+  --text-heading: var(--ink-900);
+  --text-body: var(--ink-700);
+  --text-muted: var(--ink-500);
+  --text-on-brand: #FFFFFF;
+  --text-link: var(--teal-700);
+  --text-link-hover: var(--coral-600);
+
+  --surface-page: var(--cream-100);
+  --surface-card: var(--white);
+  --surface-tint: var(--cream-50);
+  --surface-sunken: var(--cream-200);
+  --surface-inverse: var(--ink-900);
+
+  --border-soft: #EDE3D6;
+  --border-strong: #D9CCBC;
+  --border-focus: var(--teal-500);
+}
