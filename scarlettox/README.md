@@ -27,6 +27,5 @@ npm run preview  # preview the build
 
 ## Notes
 
-- Photo placeholders are intentional — no imagery was provided with the design system.
 - The heart diagram is a simplified educational schematic, not a medical illustration.
-- The donate form is a design prototype — no payment processing is wired up.
+- All giving CTAs link to the Cook Children's Health Foundation donation form (`src/site/links.js`) — this site collects no amounts or payment details.

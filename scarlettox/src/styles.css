@@ -18,3 +18,23 @@
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; }
 }
+
+/* Responsive helpers — the design's two-column grids collapse on small screens */
+.sx-cols {
+  display: grid;
+  grid-template-columns: var(--cols, 1fr 1fr);
+}
+.sx-header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+@media (max-width: 880px) {
+  .sx-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .sx-section { padding: 48px 0 !important; }
+  .sx-header-row { gap: 8px 12px; }
+}
+img { max-width: 100%; }

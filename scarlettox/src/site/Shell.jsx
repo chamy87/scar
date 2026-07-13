@@ -1,4 +1,13 @@
 import { Button } from '../components';
+import { DONATE_URL } from './links.js';
+
+export function GiveLink({ children, style }) {
+  return (
+    <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'inline-flex', ...style }}>
+      {children}
+    </a>
+  );
+}
 
 export function Wordmark({ size = 26 }) {
   return (
@@ -12,16 +21,16 @@ export function Header({ page, onNav }) {
   const links = [['home', 'Home'], ['learn', 'About TOF'], ['donate', 'Donate']];
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-soft)' }}>
-      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '14px var(--container-pad)', display: 'flex', alignItems: 'center', gap: 32 }}>
+      <div className="sx-header-row" style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '14px var(--container-pad)' }}>
         <a href="/" onClick={e => { e.preventDefault(); onNav('home'); }} style={{ textDecoration: 'none' }}><Wordmark /></a>
-        <nav style={{ display: 'flex', gap: 8, marginLeft: 'auto', alignItems: 'center' }}>
+        <nav style={{ display: 'flex', gap: 8, marginLeft: 'auto', alignItems: 'center', flexWrap: 'wrap' }}>
           {links.slice(0, 2).map(([id, label]) => (
             <a key={id} href={id === 'home' ? '/' : '/' + id} onClick={e => { e.preventDefault(); onNav(id); }} style={{
               font: '600 15px/1.2 var(--font-body)', textDecoration: 'none', padding: '8px 14px', borderRadius: 'var(--radius-pill)',
               color: page === id ? 'var(--coral-600)' : 'var(--ink-700)', background: page === id ? 'var(--brand-soft)' : 'transparent',
             }}>{label}</a>
           ))}
-          <Button variant="primary" size="sm" onClick={() => onNav('donate')} style={{ marginLeft: 8 }}>Give today</Button>
+          <GiveLink style={{ marginLeft: 8 }}><Button variant="primary" size="sm">Give today</Button></GiveLink>
         </nav>
       </div>
     </header>
@@ -55,7 +64,7 @@ export function Footer({ onNav }) {
 
 export function Section({ tint, children, style }) {
   return (
-    <section style={{ background: tint ? 'var(--surface-card)' : 'transparent', padding: '72px 0', ...style }}>
+    <section className="sx-section" style={{ background: tint ? 'var(--surface-card)' : 'transparent', padding: '72px 0', ...style }}>
       <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '0 var(--container-pad)' }}>{children}</div>
     </section>
   );

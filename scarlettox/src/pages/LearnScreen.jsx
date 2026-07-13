@@ -1,8 +1,8 @@
 import { Card, Accordion, Callout, Button, Badge } from '../components';
-import { Section, Overline } from '../site/Shell.jsx';
+import { Section, Overline, GiveLink } from '../site/Shell.jsx';
 import { HeartMap } from '../site/HeartMap.jsx';
 
-export function LearnScreen({ onNav }) {
+export function LearnScreen() {
   return (
     <main data-screen-label="About TOF">
       <Section style={{ padding: '72px 0 40px' }}>
@@ -22,12 +22,12 @@ export function LearnScreen({ onNav }) {
       </Section>
 
       <Section>
-        <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: 64 }}>
+        <div className="sx-cols" style={{ '--cols': '0.9fr 1.1fr', gap: 64 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
             <Overline>Common questions</Overline>
             <h2 style={{ font: 'var(--text-h2)' }}>What families ask most</h2>
             <p style={{ font: 'var(--text-body-md)' }}>A new diagnosis brings a lot of questions. Here are honest, plain answers to the most common ones.</p>
-            <Button variant="primary" onClick={() => onNav('donate')}>Help fund answers — give today</Button>
+            <GiveLink><Button variant="primary">Help fund answers — give today</Button></GiveLink>
           </div>
           <Card variant="outline" padding="8px 24px">
             <Accordion items={[

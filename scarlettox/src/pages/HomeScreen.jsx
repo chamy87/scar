@@ -1,21 +1,21 @@
-import { Button, Card, Stat, ProgressBar, Badge } from '../components';
-import { Section, Overline, PhotoPlaceholder } from '../site/Shell.jsx';
+import { Button, Card, Stat, Badge } from '../components';
+import { Section, Overline, GiveLink } from '../site/Shell.jsx';
 
 export function HomeScreen({ onNav }) {
   return (
     <main data-screen-label="Home">
       <Section style={{ padding: '88px 0 64px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 64, alignItems: 'center' }}>
+        <div className="sx-cols" style={{ '--cols': '1.1fr 0.9fr', gap: 64, alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'flex-start' }}>
             <Overline color="var(--coral-500)">Tetralogy of Fallot</Overline>
             <h1 style={{ font: 'var(--text-hero)' }}>Four little differences. One big heart.</h1>
             <p style={{ font: 'var(--text-body-lg)', maxWidth: 480 }}>Learn what Tetralogy of Fallot means — and help kids at Cook Children's get the care they need.</p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <Button variant="primary" size="lg" onClick={() => onNav('donate')}>Give today</Button>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <GiveLink><Button variant="primary" size="lg">Give today</Button></GiveLink>
               <Button variant="secondary" size="lg" onClick={() => onNav('learn')}>Learn about TOF</Button>
             </div>
           </div>
-          <PhotoPlaceholder label="Photo: a child playing, warm natural light (no imagery was provided)" ratio="4 / 4.4" />
+          <img src="/scar.jpeg" alt="Scarlett" style={{ width: '100%', height: 'auto', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-card)' }} />
         </div>
       </Section>
 
@@ -29,7 +29,7 @@ export function HomeScreen({ onNav }) {
       </Section>
 
       <Section>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'center' }}>
+        <div className="sx-cols" style={{ '--cols': '1fr 1fr', gap: 32, alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
             <Overline>About the condition</Overline>
             <h2 style={{ font: 'var(--text-h2)' }}>What is Tetralogy of Fallot?</h2>
@@ -45,16 +45,18 @@ export function HomeScreen({ onNav }) {
       </Section>
 
       <Section tint>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
+        <div className="sx-cols" style={{ '--cols': '1fr 1fr', gap: 48, alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
             <Overline color="var(--coral-500)">Ways to give</Overline>
             <h2 style={{ font: 'var(--text-h2)' }}>Your gift funds heart care at Cook Children's</h2>
             <p style={{ font: 'var(--text-body-md)', maxWidth: 440 }}>Every dollar donated through ScarlettOx goes to Cook Children's Hospital Foundation — supporting surgeries, family lodging, and research for kids with congenital heart disease.</p>
-            <Button variant="primary" onClick={() => onNav('donate')}>Give today</Button>
+            <GiveLink><Button variant="primary">Give today</Button></GiveLink>
           </div>
-          <Card>
-            <ProgressBar value={48200} max={75000} label="Heart Center fund" valueLabel="$48,200 of $75,000" />
-            <p style={{ font: 'var(--text-body-sm)', color: 'var(--text-muted)', marginTop: 16 }}>312 donors so far this year. Join them — no gift is too small.</p>
+          <Card style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <h3 style={{ font: 'var(--text-h3)' }}>What your gift does</h3>
+            <Stat value="$25" label="a comfort kit for a family on surgery day" tone="ink" />
+            <Stat value="$100" label="a night of lodging so parents can stay close" tone="ink" />
+            <Stat value="$250" label="helps fund echo screenings for newborns" tone="ink" />
           </Card>
         </div>
       </Section>

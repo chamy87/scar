@@ -85,7 +85,7 @@ export function HeartMap({ style }) {
 
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <svg width="340" height="380" viewBox="0 0 380 420" role="img" aria-label={isTof ? 'Diagram of a heart with Tetralogy of Fallot, with animated blood flow' : 'Diagram of a repaired heart with normal blood flow'} style={{ animation: 'fh-heartbeat 2.4s var(--ease-out) infinite', transformOrigin: '50% 60%' }}>
+          <svg width="340" height="380" viewBox="0 0 380 420" role="img" preserveAspectRatio="xMidYMid meet" aria-label={isTof ? 'Diagram of a heart with Tetralogy of Fallot, with animated blood flow' : 'Diagram of a repaired heart with normal blood flow'} style={{ animation: 'fh-heartbeat 2.4s var(--ease-out) infinite', transformOrigin: '50% 60%', width: '100%', maxWidth: 340, height: 'auto' }}>
             {/* aorta */}
             <path d="M215 115 L215 38 Q215 24 229 24 L241 24 Q255 24 255 38 L255 120 Z" fill={hl('aorta') ? 'var(--coral-300)' : 'var(--coral-100)'} stroke={hl('aorta') ? 'var(--coral-600)' : 'var(--coral-300)'} strokeWidth="3" style={{ transition: 'all .3s' }} />
             {/* pulmonary artery: pinched with TOF, wide after repair */}
