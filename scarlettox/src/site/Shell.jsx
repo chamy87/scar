@@ -1,5 +1,14 @@
 import { Button } from '../components';
-import { DONATE_URL } from './links.js';
+import { DONATE_URL, SOURCES } from './links.js';
+
+export function SourceLink({ source, prefix = 'Source:', style }) {
+  const s = SOURCES[source];
+  return (
+    <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ font: '400 13px/1.5 var(--font-body)', color: 'var(--text-muted)', ...style }}>
+      {prefix ? prefix + ' ' : ''}{s.label}
+    </a>
+  );
+}
 
 export function GiveLink({ children, style }) {
   return (
@@ -43,7 +52,7 @@ export function Footer({ onNav }) {
       <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '56px var(--container-pad) 40px', display: 'flex', flexWrap: 'wrap', gap: 48, justifyContent: 'space-between' }}>
         <div style={{ maxWidth: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <span style={{ font: '700 24px/1 var(--font-display)', color: '#fff' }}>scarlett<span style={{ color: 'var(--coral-300)' }}>ox</span></span>
-          <p style={{ font: 'var(--text-body-sm)', color: 'var(--ink-300)' }}>Made in honor of Scarlett — "ox" for the oxygen every little heart deserves. Education and hope for families facing Tetralogy of Fallot; every donation goes to Cook Children's Hospital Foundation.</p>
+          <p style={{ font: 'var(--text-body-sm)', color: 'var(--ink-300)' }}>Made in honor of Scarlett — "ox" for the oxygen every little heart deserves. Education and hope for families facing Tetralogy of Fallot; every donation goes to Cook Children's Health Foundation.</p>
         </div>
         <div style={{ display: 'flex', gap: 64 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

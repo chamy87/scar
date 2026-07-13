@@ -1,5 +1,5 @@
 import { Button, Card, Stat, Callout } from '../components';
-import { Section, Overline, GiveLink } from '../site/Shell.jsx';
+import { Section, Overline, GiveLink, SourceLink } from '../site/Shell.jsx';
 
 export function DonateScreen() {
   return (
@@ -8,7 +8,7 @@ export function DonateScreen() {
         <div style={{ maxWidth: 620, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Overline color="var(--coral-500)">Give today</Overline>
           <h1 style={{ font: 'var(--text-h1)' }}>Every gift mends a little heart</h1>
-          <p style={{ font: 'var(--text-body-lg)' }}>100% of your donation goes to Cook Children's Hospital Foundation, supporting kids with congenital heart disease.</p>
+          <p style={{ font: 'var(--text-body-lg)' }}>Donations go directly to Cook Children's Health Foundation, supporting kids with congenital heart disease.</p>
         </div>
       </Section>
 
@@ -23,12 +23,12 @@ export function DonateScreen() {
           </Card>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <Card variant="tinted" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <h3 style={{ font: 'var(--text-h3)' }}>What your gift does</h3>
-              <Stat value="$25" label="a comfort kit for a family on surgery day" tone="ink" />
-              <Stat value="$100" label="a night of lodging so parents can stay close" tone="ink" />
-              <Stat value="$250" label="helps fund echo screenings for newborns" tone="ink" />
+              <h3 style={{ font: 'var(--text-h3)' }}>Why it matters</h3>
+              <Stat value="~1 in 100" label={<>babies in the U.S. is born with a congenital heart defect — <SourceLink source="cdcData" prefix="" /></>} tone="ink" />
+              <Stat value="1 in 4" label={<>of those babies has a critical defect needing surgery in their first year — <SourceLink source="cdcData" prefix="" /></>} tone="ink" />
+              <Stat value="95%+" label={<>of children survive Tetralogy of Fallot repair — <SourceLink source="childrensNational" prefix="" /></>} tone="ink" />
             </Card>
-            <Callout tone="info" title="Tax deductible">Cook Children's Health Foundation is a 501(c)(3) nonprofit. You'll receive a receipt for your records.</Callout>
+            <Callout tone="info" title="Tax deductible">Cook Children's Health Foundation is a 501(c)(3) nonprofit — you'll receive a receipt from them for your records. <SourceLink source="foundation" prefix="Details:" /></Callout>
           </div>
         </div>
       </Section>

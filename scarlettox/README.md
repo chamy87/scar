@@ -1,6 +1,6 @@
 # ScarlettOx
 
-Informational + fundraising website about **Tetralogy of Fallot (TOF)**, named for Scarlett plus "ox" for oxygen. The site educates visitors about TOF and directs donations to Cook Children's Hospital Foundation.
+Informational + fundraising website about **Tetralogy of Fallot (TOF)**, named for Scarlett plus "ox" for oxygen. The site educates visitors about TOF and directs donations to Cook Children's Health Foundation. Medical and statistical claims cite Johns Hopkins Medicine, the CDC, Children's National Hospital, the American Heart Association, and Mayo Clinic (see `src/site/links.js`).
 
 Implemented from the [Four Hearts — TOF Design System](https://claude.ai/design/p/cd52eced-fb1d-4eb5-ac7f-db405e8c1b33) Claude Design project.
 
