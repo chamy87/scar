@@ -1,4 +1,4 @@
-import { Button, Card, Stat, Badge, Accordion, Callout } from '../components';
+import { Button, Card, Stat, Accordion, Callout } from '../components';
 import { Section, Overline, GiveLink, SourceLink } from '../site/Shell.jsx';
 import { HeartMap } from '../site/HeartMap.jsx';
 import { SOURCES } from '../site/links.js';
@@ -79,10 +79,6 @@ export function Landing() {
               </div>
             </div>
           ))}
-          <Card variant="lifted" style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 48 }}>
-            <Badge tone="accent">A note from our family</Badge>
-            <p style={{ font: 'var(--text-body-md)', fontStyle: 'italic' }}>"We spent 18 weeks waiting to meet a baby we already knew needed help. If this site spares one family a night of frantic searching — or funds one hour of the care Scarlett received — it's done its job."</p>
-          </Card>
         </div>
       </Section>
 
