@@ -27,13 +27,13 @@ export function Wordmark({ size = 26 }) {
 }
 
 export function Header({ page, onNav }) {
-  const links = [['home', 'Home'], ['learn', 'About TOF'], ['donate', 'Donate']];
+  const links = [['home', 'Home'], ['story', "Scarlett's Story"], ['learn', 'About TOF'], ['donate', 'Donate']];
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-soft)' }}>
       <div className="sx-header-row" style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '14px var(--container-pad)' }}>
         <a href="/" onClick={e => { e.preventDefault(); onNav('home'); }} style={{ textDecoration: 'none' }}><Wordmark /></a>
         <nav style={{ display: 'flex', gap: 8, marginLeft: 'auto', alignItems: 'center', flexWrap: 'wrap' }}>
-          {links.slice(0, 2).map(([id, label]) => (
+          {links.slice(0, 3).map(([id, label]) => (
             <a key={id} href={id === 'home' ? '/' : '/' + id} onClick={e => { e.preventDefault(); onNav(id); }} style={{
               font: '600 15px/1.2 var(--font-body)', textDecoration: 'none', padding: '8px 14px', borderRadius: 'var(--radius-pill)',
               color: page === id ? 'var(--coral-600)' : 'var(--ink-700)', background: page === id ? 'var(--brand-soft)' : 'transparent',
@@ -57,7 +57,7 @@ export function Footer({ onNav }) {
         <div style={{ display: 'flex', gap: 64 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <span style={{ font: 'var(--text-overline)', letterSpacing: 'var(--tracking-overline)', textTransform: 'uppercase', color: 'var(--ink-500)' }}>Site</span>
-            {[['home', 'Home'], ['learn', 'About TOF'], ['donate', 'Donate']].map(([id, label]) => (
+            {[['home', 'Home'], ['story', "Scarlett's Story"], ['learn', 'About TOF'], ['donate', 'Donate']].map(([id, label]) => (
               <a key={id} href={id === 'home' ? '/' : '/' + id} onClick={e => { e.preventDefault(); onNav(id); }} style={{ font: 'var(--text-body-sm)', color: 'var(--cream-200)', textDecoration: 'none' }}>{label}</a>
             ))}
           </div>

@@ -39,4 +39,9 @@ export const SOURCES = {
     url: 'https://foundation.cookchildrens.org/',
     note: 'The 501(c)(3) nonprofit that receives every donation made through this site.',
   },
+  giftImpact: {
+    label: "Cook Children's giving levels",
+    url: 'https://www.cookchildrenspromise.org/ways-to-give/monthly/',
+    note: 'What gifts provide: $12 a PrayerBear, $45 a month of food for a facility dog, $75 a medical center meal card.',
+  },
 };

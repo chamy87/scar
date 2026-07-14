@@ -23,10 +23,11 @@ export function DonateScreen() {
           </Card>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <Card variant="tinted" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <h3 style={{ font: 'var(--text-h3)' }}>Why it matters</h3>
-              <Stat value="~1 in 100" label={<>babies in the U.S. is born with a congenital heart defect — <SourceLink source="cdcData" prefix="" /></>} tone="ink" />
-              <Stat value="1 in 4" label={<>of those babies has a critical defect needing surgery in their first year — <SourceLink source="cdcData" prefix="" /></>} tone="ink" />
-              <Stat value="95%+" label={<>of children survive Tetralogy of Fallot repair — <SourceLink source="childrensNational" prefix="" /></>} tone="ink" />
+              <h3 style={{ font: 'var(--text-h3)' }}>What your gift does</h3>
+              <Stat value="$12" label="provides a PrayerBear for a patient" tone="ink" />
+              <Stat value="$45" label="provides food for a facility dog for one month" tone="ink" />
+              <Stat value="$75" label="provides a meal card for a family at the medical center" tone="ink" />
+              <SourceLink source="giftImpact" />
             </Card>
             <Callout tone="info" title="Tax deductible">Cook Children's Health Foundation is a 501(c)(3) nonprofit — you'll receive a receipt from them for your records. <SourceLink source="foundation" prefix="Details:" /></Callout>
           </div>
