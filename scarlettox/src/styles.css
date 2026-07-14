@@ -19,6 +19,13 @@
   * { animation: none !important; }
 }
 
+/* Single-page anchor navigation */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+section[id] { scroll-margin-top: 72px; }
+
 /* Responsive helpers — the design's two-column grids collapse on small screens */
 .sx-cols {
   display: grid;

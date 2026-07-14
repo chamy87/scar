@@ -7,15 +7,15 @@ Implemented from the [Four Hearts — TOF Design System](https://claude.ai/desig
 ## Stack
 
 - Vite + React 19 (plain JSX, inline styles per the design system)
-- react-router-dom — `/` (Home), `/learn` (About TOF, interactive heart map), `/donate`
+- Single page — Scarlett's story is the landing content, with anchor navigation (`#story`, `#heart`, `#faq`, `#give`)
 - Design tokens as CSS custom properties in `src/tokens/`
 
 ## Structure
 
 - `src/tokens/` — color, typography, spacing, effects, font tokens (verbatim from the design system)
 - `src/components/` — design-system components (forms + content)
-- `src/site/` — Shell (Header/Footer/Section/Overline/PhotoPlaceholder) and the interactive `HeartMap`
-- `src/pages/` — Home, Learn, Donate screens
+- `src/site/` — Shell (Header/Footer/Section/Overline/GiveLink/SourceLink) and the interactive `HeartMap`
+- `src/pages/Landing.jsx` — the whole site: hero, stats, timeline, interactive heart, FAQ, giving, sources
 
 ## Commands
 

@@ -1,19 +1,19 @@
 import { Button } from '../components';
 import { DONATE_URL, SOURCES } from './links.js';
 
+export function GiveLink({ children, style }) {
+  return (
+    <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'inline-flex', ...style }}>
+      {children}
+    </a>
+  );
+}
+
 export function SourceLink({ source, prefix = 'Source:', style }) {
   const s = SOURCES[source];
   return (
     <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ font: '400 13px/1.5 var(--font-body)', color: 'var(--text-muted)', ...style }}>
       {prefix ? prefix + ' ' : ''}{s.label}
-    </a>
-  );
-}
-
-export function GiveLink({ children, style }) {
-  return (
-    <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'inline-flex', ...style }}>
-      {children}
     </a>
   );
 }
@@ -26,17 +26,18 @@ export function Wordmark({ size = 26 }) {
   );
 }
 
-export function Header({ page, onNav }) {
-  const links = [['home', 'Home'], ['story', "Scarlett's Story"], ['learn', 'About TOF'], ['donate', 'Donate']];
+const NAV_LINKS = [['#story', "Her story"], ['#heart', 'About TOF']];
+
+export function Header() {
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--border-soft)' }}>
       <div className="sx-header-row" style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '14px var(--container-pad)' }}>
-        <a href="/" onClick={e => { e.preventDefault(); onNav('home'); }} style={{ textDecoration: 'none' }}><Wordmark /></a>
+        <a href="#top" style={{ textDecoration: 'none' }}><Wordmark /></a>
         <nav style={{ display: 'flex', gap: 8, marginLeft: 'auto', alignItems: 'center', flexWrap: 'wrap' }}>
-          {links.slice(0, 3).map(([id, label]) => (
-            <a key={id} href={id === 'home' ? '/' : '/' + id} onClick={e => { e.preventDefault(); onNav(id); }} style={{
+          {NAV_LINKS.map(([href, label]) => (
+            <a key={href} href={href} style={{
               font: '600 15px/1.2 var(--font-body)', textDecoration: 'none', padding: '8px 14px', borderRadius: 'var(--radius-pill)',
-              color: page === id ? 'var(--coral-600)' : 'var(--ink-700)', background: page === id ? 'var(--brand-soft)' : 'transparent',
+              color: 'var(--ink-700)',
             }}>{label}</a>
           ))}
           <GiveLink style={{ marginLeft: 8 }}><Button variant="primary" size="sm">Give today</Button></GiveLink>
@@ -46,7 +47,7 @@ export function Header({ page, onNav }) {
   );
 }
 
-export function Footer({ onNav }) {
+export function Footer() {
   return (
     <footer style={{ background: 'var(--surface-inverse)', color: 'var(--cream-200)', marginTop: 96 }}>
       <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '56px var(--container-pad) 40px', display: 'flex', flexWrap: 'wrap', gap: 48, justifyContent: 'space-between' }}>
@@ -57,8 +58,8 @@ export function Footer({ onNav }) {
         <div style={{ display: 'flex', gap: 64 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <span style={{ font: 'var(--text-overline)', letterSpacing: 'var(--tracking-overline)', textTransform: 'uppercase', color: 'var(--ink-500)' }}>Site</span>
-            {[['home', 'Home'], ['story', "Scarlett's Story"], ['learn', 'About TOF'], ['donate', 'Donate']].map(([id, label]) => (
-              <a key={id} href={id === 'home' ? '/' : '/' + id} onClick={e => { e.preventDefault(); onNav(id); }} style={{ font: 'var(--text-body-sm)', color: 'var(--cream-200)', textDecoration: 'none' }}>{label}</a>
+            {[['#story', "Her story"], ['#heart', 'About TOF'], ['#give', 'Give']].map(([href, label]) => (
+              <a key={href} href={href} style={{ font: 'var(--text-body-sm)', color: 'var(--cream-200)', textDecoration: 'none' }}>{label}</a>
             ))}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 240 }}>
@@ -71,9 +72,9 @@ export function Footer({ onNav }) {
   );
 }
 
-export function Section({ tint, children, style }) {
+export function Section({ tint, children, style, ...rest }) {
   return (
-    <section className="sx-section" style={{ background: tint ? 'var(--surface-card)' : 'transparent', padding: '72px 0', ...style }}>
+    <section className="sx-section" style={{ background: tint ? 'var(--surface-card)' : 'transparent', padding: '72px 0', ...style }} {...rest}>
       <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '0 var(--container-pad)' }}>{children}</div>
     </section>
   );
