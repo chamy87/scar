@@ -10,9 +10,9 @@ const STORY_STEPS = [
     body: "At the anatomy scan, doctors noticed something different about Twin B's heart. A fetal echocardiogram confirmed it: Tetralogy of Fallot — four differences in how her heart had formed. Twin B had a name soon after. Scarlett.",
   },
   {
-    when: 'Weeks 20–38',
+    when: 'Weeks 20–35',
     title: 'Two doctors, twice the appointments',
-    body: "From that day on, Scarlett's mom saw a high-risk OB alongside her regular OB — extra ultrasounds and echocardiograms to watch both babies as the weeks crawled by. Knowing before birth meant the care team was ready the moment the twins arrived.",
+    body: "From that day on, Scarlett's mom saw a high-risk OB and a pediatric cardiologist alongside her regular OB — extra ultrasounds and fetal echocardiograms to watch both babies as the weeks crawled by. The cardiologist mapped out exactly what Scarlett's heart was doing and what it would need. Knowing before birth meant the care team was ready the moment the twins arrived.",
   },
   {
     when: 'March 2026',
