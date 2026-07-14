@@ -39,8 +39,13 @@ const STORY_STEPS = [
 export function Landing() {
   return (
     <main id="top" data-screen-label="ScarlettOx">
-      <Section style={{ padding: '88px 0 56px' }}>
-        <div className="sx-cols" style={{ '--cols': '1fr 0.85fr', gap: 64, alignItems: 'center' }}>
+      <Section style={{ padding: '88px 0 56px', position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: '50%', right: '-140px', transform: 'translateY(-50%)', width: 560, height: 560, pointerEvents: 'none', zIndex: 0 }}>
+          <svg viewBox="0 0 24 24" width="100%" height="100%" style={{ animation: 'sx-lubdub 2.4s var(--ease-out) infinite', transformOrigin: '50% 50%', opacity: 0.55 }}>
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="var(--brand-soft)" />
+          </svg>
+        </div>
+        <div className="sx-cols" style={{ '--cols': '1fr 0.85fr', gap: 64, alignItems: 'center', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'flex-start' }}>
             <Overline color="var(--coral-500)">Scarlett's story</Overline>
             <h1 style={{ font: 'var(--text-hero)' }}>Twin B had a secret.</h1>
@@ -53,7 +58,7 @@ export function Landing() {
       <Section tint style={{ padding: '56px 0' }}>
         <div style={{ display: 'flex', gap: 64, flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
           <Stat value="1 in 2,518" label={<>babies in the U.S. is born with Tetralogy of Fallot — <SourceLink source="hopkins" prefix="" /></>} tone="ink" />
-          <Stat value="4" label={<>heart differences make up the condition — <SourceLink source="cdcTof" prefix="" /></>} />
+          <Stat value="4" label={<>heart defects make up the condition — <SourceLink source="cdcTof" prefix="" /></>} />
           <Stat value="95%+" label={<>of children survive repair surgery — <SourceLink source="childrensNational" prefix="" /></>} tone="accent" />
           <Stat value="100%" label={<>of your gift goes to <SourceLink source="foundation" prefix="" style={{ color: 'var(--text-body)' }} /> — giving happens on their secure form</>} />
         </div>
