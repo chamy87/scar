@@ -11,7 +11,7 @@ const STORY_STEPS = [
   },
   {
     when: 'Weeks 20–35',
-    title: 'Two doctors, twice the appointments',
+    title: 'Three doctors, extra appointments',
     body: "From that day on, Scarlett's mom saw a high-risk OB and a pediatric cardiologist alongside her regular OB — extra ultrasounds and fetal echocardiograms to watch both babies as the weeks crawled by. The cardiologist mapped out exactly what Scarlett's heart was doing and what it would need. Knowing before birth meant the care team was ready the moment the twins arrived.",
   },
   {
